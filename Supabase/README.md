@@ -56,11 +56,14 @@ Supabase/
 │   ├── 005_economy.sql               gemas, compras, ledger, entitlements
 │   ├── 006_rpc.sql                   lo que el cliente puede ejecutar
 │   ├── 007_reference_data.sql        el catálogo del juego (también en prod)
-│   └── 008_award_run.sql             acreditación atómica, solo service_role
+│   ├── 008_award_run.sql             acreditación atómica, solo service_role
+│   └── 009_mercadopago.sql           productos en PYG + acreditación de compras
 ├── functions/
-│   ├── _shared/                      auth + cors
+│   ├── _shared/                      auth, cors, mercadopago
 │   ├── enter-dungeon/                cobra energía, abre sesión
-│   └── complete-dungeon-run/         valida y acredita
+│   ├── complete-dungeon-run/         valida y acredita
+│   ├── create-payment/               abre compra, devuelve link de checkout
+│   └── payment-webhook/              recibe MercadoPago, acredita gemas
 └── seeds/
     └── seed.sql                      cazadores de prueba (solo local)
 ```
@@ -155,7 +158,47 @@ podría gastar un minuto y comerse un rechazo por falta de energía.
 | `set_clan_defender(hunter_id)` | Líder y capitanes |
 
 Solo `service_role`: `spend_energy`, `refund_energy`, `award_dungeon_run`,
-`expire_dungeon_sessions`.
+`expire_dungeon_sessions`, `credit_purchase`, `fail_purchase`.
+
+## Pagos — MercadoPago Paraguay
+
+```
+create-payment                        MercadoPago
+  ├─ lee el precio de gem_products      │
+  │  (el cliente solo manda el SKU)     │
+  ├─ crea purchases (pending)           │
+  ├─ POST /checkout/preferences ────────▶
+  │     external_reference = purchase.id
+  └─ devuelve init_point ◀──────────────┘
+
+  ═══ el jugador paga en el checkout ═══
+
+payment-webhook  ◀──────────────────── notificación
+  ├─ valida firma HMAC del x-signature
+  ├─ GET /v1/payments/{id}  ← el estado real, no el body
+  ├─ verifica que el monto y la moneda coincidan
+  └─ credit_purchase()  → gemas + asiento en gem_ledger
+```
+
+Tres cosas que hacen que esto no se rompa:
+
+- **`credit_purchase` es idempotente.** MercadoPago reintenta hasta recibir un
+  2xx, así que la misma notificación llega varias veces. Una compra ya en
+  `paid` devuelve la fila sin volver a sumar.
+- **Casi todo responde 200.** Devolver 500 por una notificación que nunca
+  vamos a poder procesar genera reintentos infinitos. Solo se devuelve error
+  en fallos transitorios.
+- **`payment-webhook` tiene `verify_jwt = false`** en `config.toml`.
+  MercadoPago no manda JWT: autentica con la firma. Sin ese flag el webhook
+  devuelve 401 y nada se acredita nunca.
+
+**El guaraní no tiene subunidad.** `price_cents` guarda unidades mínimas y
+`currency_exponent` dice cuántos decimales tiene la moneda: 2 para USD, 0 para
+PYG. Sin eso el cliente muestra ₲7.000 como ₲70,00.
+
+> ⚠️ **Los precios en PYG de `009_mercadopago.sql` son placeholder.** No salen
+> de ninguna cotización real: están para que el flujo funcione end-to-end.
+> Definilos antes de cobrarle a alguien.
 
 ## Sin pay2win, a nivel schema
 
@@ -182,8 +225,9 @@ Functions no pasaron por `deno check`. El primer `make db-reset` es la prueba.
 - [ ] Aplicar las migrations y arreglar lo que falle
 - [ ] Scheduler de Clan Wars cada 3 días (pg_cron o Edge Function)
 - [ ] `expire_dungeon_sessions()` programado
-- [ ] Integración con MercadoPago Paraguay: Edge Functions `create-payment` y
-      `payment-webhook`, productos en PYG
+- [ ] Fijar los precios reales en PYG (hoy son placeholder)
+- [ ] Job que cierre las compras `pending` viejas
+- [ ] Probar el webhook con las credenciales de prueba de MercadoPago
 - [ ] Cadenas de poderes de Phantom Guard, Abyss Mage y Beast Hunter
 - [ ] Rate limiting en `enter-dungeon`
 - [ ] Leaderboards (por rango, por clan)

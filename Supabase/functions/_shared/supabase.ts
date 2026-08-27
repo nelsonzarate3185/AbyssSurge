@@ -10,12 +10,12 @@ export function adminClient(): SupabaseClient {
 }
 
 /** Resuelve el jugador a partir del Bearer token de la request. */
-export async function requireUser(req: Request): Promise<{ id: string }> {
+export async function requireUser(req: Request): Promise<{ id: string; email?: string }> {
   const auth = req.headers.get("Authorization");
   if (!auth?.startsWith("Bearer ")) throw new Error("missing bearer token");
 
   const { data, error } = await adminClient().auth.getUser(auth.slice(7));
   if (error || !data.user) throw new Error("invalid token");
 
-  return { id: data.user.id };
+  return { id: data.user.id, email: data.user.email };
 }

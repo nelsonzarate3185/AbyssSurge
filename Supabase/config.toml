@@ -46,6 +46,27 @@ enable_anonymous_sign_ins = true
 enable_signup = true
 enable_confirmations = false
 
+# ─────────────────────────────────────────────────────────────
+# Edge Functions
+#
+# Por default Supabase exige un JWT válido en toda función. MercadoPago no
+# manda uno: autentica con la firma HMAC del header x-signature. Sin este
+# verify_jwt = false el webhook devuelve 401 y MercadoPago reintenta para
+# siempre sin que nada se acredite.
+# ─────────────────────────────────────────────────────────────
+
+[functions.payment-webhook]
+verify_jwt = false
+
+[functions.create-payment]
+verify_jwt = true
+
+[functions.enter-dungeon]
+verify_jwt = true
+
+[functions.complete-dungeon-run]
+verify_jwt = true
+
 [edge_runtime]
 enabled = true
 policy = "oneshot"

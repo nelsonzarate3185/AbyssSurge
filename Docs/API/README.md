@@ -136,6 +136,87 @@ se gastó al entrar y no vuelve.
 
 ---
 
+### `POST /functions/v1/create-payment`
+
+Abre una compra de gemas y devuelve el link de checkout de MercadoPago.
+
+**Request:**
+```json
+{ "sku": "gems_500_pyg" }
+```
+
+El **precio no viene del cliente**: se lee de `gem_products`. Lo único que el
+jugador elige es el SKU.
+
+**Response `200`:**
+```json
+{
+  "purchaseId": "0f8b…",
+  "preferenceId": "123456789-abc…",
+  "gemsGranted": 505,
+  "amount": 35000,
+  "currency": "PYG",
+  "checkoutUrl": "https://www.mercadopago.com.py/checkout/v1/redirect?pref_id=…",
+  "sandboxCheckoutUrl": "https://sandbox.mercadopago.com.py/checkout/…"
+}
+```
+
+`gemsGranted` ya incluye el `bonus_pct` del paquete. En sandbox hay que abrir
+`sandboxCheckoutUrl`.
+
+**Errores:**
+
+| Código | Cuándo |
+|---|---|
+| `401` | Token inválido |
+| `404` | SKU inexistente, o el cazador no existe |
+| `410` | `product is not available` — SKU desactivado |
+| `422` | El SKU está en USD. MercadoPago Paraguay solo cobra en PYG |
+| `502` | MercadoPago no respondió. La compra queda en `failed` |
+
+---
+
+### `POST /functions/v1/payment-webhook`
+
+**No la llama el cliente.** La llama MercadoPago.
+
+Es la única función con `verify_jwt = false`: MercadoPago no manda JWT,
+autentica con la firma HMAC del header `x-signature`.
+
+Validación de la firma — manifiesto textual:
+
+```
+id:<data.id>;request-id:<x-request-id>;ts:<ts>;
+```
+
+HMAC-SHA256 en hexadecimal, clave = `MERCADOPAGO_WEBHOOK_SECRET`, comparación
+en tiempo constante. Si falta alguno de los tres tramos se omite entero. El
+`data.id` sale del **query string**, no del body: es el que MercadoPago firma.
+
+Tres reglas de esta función:
+
+1. **El body no se cree.** Solo aporta un id; el estado real se consulta
+   contra `GET /v1/payments/{id}` con nuestro access token.
+2. **El monto se verifica.** Si `transaction_amount` o `currency_id` no
+   coinciden con lo que abrimos, no se acredita y queda para revisión manual.
+3. **Casi todo devuelve 200.** MercadoPago reintenta ante cualquier no-2xx;
+   devolver 500 por una notificación que nunca vamos a poder procesar genera
+   reintentos infinitos. Solo se devuelve error en fallos transitorios
+   (`502` si la API de MP no responde, `500` si falla la acreditación).
+
+Acreditación vía `credit_purchase()`, que es **idempotente**: una compra ya
+en `paid` devuelve la fila sin volver a sumar gemas.
+
+| Estado MercadoPago | `purchase_status` | Efecto |
+|---|---|---|
+| `approved` | `paid` | Suma gemas + asiento en `gem_ledger` |
+| `rejected` | `failed` | Cierra la compra |
+| `cancelled` | `cancelled` | Cierra la compra |
+| `refunded`, `charged_back` | `refunded` | **Descuenta** las gemas (hasta 0) + asiento negativo |
+| `pending`, `authorized`, `in_process`, `in_mediation` | — | Queda abierta, se espera otra notificación |
+
+---
+
 ## RPCs
 
 `POST /rest/v1/rpc/<nombre>`
@@ -231,7 +312,6 @@ Cualquier otra columna es rechazada por el grant, no por la policy.
 
 ## Pendiente
 
-- [ ] MercadoPago Paraguay: `create-payment` + `payment-webhook`, productos en PYG
 - [ ] Endpoints de Clan Wars (declarar, atacar, resolver)
 - [ ] Leaderboards
 - [ ] Rate limiting en `enter-dungeon`
