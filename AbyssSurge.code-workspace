@@ -1,0 +1,47 @@
+{
+  "folders": [
+    { "name": "📖 Docs & Diseño", "path": "." },
+    { "name": "🎮 Unity (Cliente)", "path": "Unity" },
+    { "name": "🗄️ Supabase (Backend)", "path": "Supabase" },
+    { "name": "🎨 Design (Assets)", "path": "Design" }
+  ],
+  "settings": {
+    "files.exclude": {
+      "Unity": true,
+      "Supabase": true,
+      "Design": true,
+      "**/Library": true,
+      "**/Temp": true,
+      "**/obj": true
+    },
+    "search.exclude": {
+      "**/Library": true,
+      "**/Temp": true,
+      "**/node_modules": true,
+      "**/*.meta": true
+    },
+    "files.associations": {
+      "*.cs": "csharp",
+      "*.uss": "css",
+      "*.uxml": "xml"
+    },
+    "[sql]": { "editor.tabSize": 2 },
+    "[csharp]": { "editor.tabSize": 4 },
+    "[typescript]": { "editor.tabSize": 2 },
+    "editor.rulers": [100],
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "deno.enablePaths": ["Supabase/functions"],
+    "deno.lint": true,
+    "deno.unstable": true
+  },
+  "extensions": {
+    "recommendations": [
+      "visualstudiotoolsforunity.vstuc",
+      "ms-dotnettools.csdevkit",
+      "denoland.vscode-deno",
+      "supabase.postgrestools",
+      "yzhang.markdown-all-in-one"
+    ]
+  }
+}

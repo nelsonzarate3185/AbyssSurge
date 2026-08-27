@@ -1,0 +1,20 @@
+* text=auto eol=lf
+
+# El Makefile y los scripts de shell rompen con CRLF.
+Makefile        text eol=lf
+*.sh            text eol=lf
+
+# Assets binarios: nunca normalizar.
+*.png binary
+*.jpg binary
+*.ogg binary
+*.wav binary
+*.fbx binary
+*.psd binary
+*.unitypackage binary
+
+# Archivos de Unity: merge textual, no binario.
+*.unity   text eol=lf merge=unityyamlmerge
+*.prefab  text eol=lf merge=unityyamlmerge
+*.asset   text eol=lf merge=unityyamlmerge
+*.meta    text eol=lf merge=unityyamlmerge

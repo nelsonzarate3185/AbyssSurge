@@ -1,0 +1,77 @@
+# ─── Entorno ────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ─── Unity ──────────────────────────────────────────────────
+Unity/[Ll]ibrary/
+Unity/[Tt]emp/
+Unity/[Oo]bj/
+Unity/[Bb]uild/
+Unity/[Bb]uilds/
+Unity/[Ll]ogs/
+Unity/[Uu]ser[Ss]ettings/
+Unity/[Mm]emoryCaptures/
+Unity/[Rr]ecordings/
+Unity/Assets/AssetStoreTools*
+Unity/Assets/Plugins/Editor/JetBrains*
+*.csproj
+*.unityproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+crashlytics-build.properties
+
+# ─── Assets binarios grandes (van a storage externo) ────────
+*.psd
+*.psb
+*.ai
+*.blend
+*.blend1
+*.fbx
+*.max
+*.wav
+*.aiff
+*.flac
+*.mov
+*.mp4
+
+# ─── Supabase ───────────────────────────────────────────────
+Supabase/.branches/
+Supabase/.temp/
+.supabase/
+
+# ─── Node / Deno ────────────────────────────────────────────
+node_modules/
+dist/
+.deno/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ─── Editores / SO ──────────────────────────────────────────
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Claude Code (config local de máquina) ──────────────────
+.claude/settings.local.json
+.claude/settings.json
