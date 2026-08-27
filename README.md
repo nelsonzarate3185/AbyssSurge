@@ -1,17 +1,30 @@
-# AbyssSurge
+# Abyss Surge — *Rise from the Darkness*
 
-Juego móvil (Unity) con backend en la nube (Supabase).
+RPG estratégico mobile (Clash of Clans + Solo Leveling) en Unity, con backend
+en Supabase y pagos por MercadoPago Paraguay. Android + iOS.
 
-> **Estado:** scaffold inicial. Los documentos de diseño son un borrador v0 —
-> están pensados para que los edites, no para tomarlos como canon.
+> ### ⚠️ Estado del repo
+>
+> La fuente de verdad del diseño es
+> [Docs/Abyss_Surge_Trama_y_Personajes.pdf](Docs/Abyss_Surge_Trama_y_Personajes.pdf).
+>
+> [STORY.md](STORY.md) y [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md) están
+> reescritos desde ese PDF y son válidos.
+>
+> **Todo el resto del scaffold —[GAME_MECHANICS.md](GAME_MECHANICS.md), el
+> schema de [Supabase/](Supabase/), los scripts de [Unity/](Unity/) y
+> [Docs/](Docs/)— se escribió antes de que apareciera el PDF y describe un
+> juego distinto** (un roguelite de descenso vertical). Sirve como andamiaje
+> de estructura, no como especificación. Hay que reescribirlo.
 
 ## Estructura del workspace
 
 | Carpeta | Qué contiene |
 |---|---|
-| [STORY.md](STORY.md) | Trama, worldbuilding, arcos narrativos |
-| [GAME_MECHANICS.md](GAME_MECHANICS.md) | Sistemas de juego, economía, progresión |
-| [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md) | Personajes, roles, stats base |
+| [Docs/Abyss_Surge_Trama_y_Personajes.pdf](Docs/Abyss_Surge_Trama_y_Personajes.pdf) | **Fuente de verdad** del diseño |
+| [STORY.md](STORY.md) | Trama, mundo de Aetheron, 6 actos ✅ |
+| [GAME_MECHANICS.md](GAME_MECHANICS.md) | Índice de sistemas reales + borrador descartado ⚠️ |
+| [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md) | 4 clases jugables, 4 NPCs, rangos, poderes ✅ |
 | [SETUP_CLAUDE_CODE.md](SETUP_CLAUDE_CODE.md) | Cómo trabajar en este repo con Claude Code |
 | [Unity/](Unity/) | Cliente móvil — scripts, escenas, recursos |
 | [Supabase/](Supabase/) | Schema SQL, Edge Functions, seeds |

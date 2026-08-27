@@ -1,88 +1,108 @@
-# AbyssSurge — Diseño de personajes
+# Abyss Surge — Diseño de personajes
 
-> **Borrador v0.** Stats en escala 1–10 relativa, no valores finales.
+> **Fuente:** [Docs/Abyss_Surge_Trama_y_Personajes.pdf](Docs/Abyss_Surge_Trama_y_Personajes.pdf)
+> (Nelson Zarate, 27/08/2026). Este documento transcribe y estructura ese PDF.
+> Reemplaza por completo el borrador especulativo anterior.
 
-## Jugador — El Surfista
+## Clases jugables
 
-El avatar es **mudo y personalizable**. La identidad la aporta la tabla, no la cara.
+Cuatro arquetipos balanceados. El jugador elige uno al despertar (Acto I).
 
-**Silueta:** traje presurizado ajustado, casco con visor de una sola franja
-luminosa. La franja **cambia de color con la Corrupción**: cian (0) → verde
-(50) → ámbar (75) → blanco (100). Es el HUD de estado más importante del juego
-y está en el personaje, no en la interfaz.
+| Clase | HP | ATK | DEF | VEL | Fortaleza | Debilidad |
+|---|---:|---:|---:|---:|---|---|
+| **Dark Slayer** | 100 | 12 | 4 | 9 | Daño extremo, velocidad rápida | Muy frágil |
+| **Phantom Guard** | 140 | 8 | 8 | 5 | Durabilidad extrema | Daño lento |
+| **Abyss Mage** | 90 | 9 | 5 | 10 | AoE devastador, maná ilimitado | Muy frágil |
+| **Beast Hunter** | 110 | 11 | 6 | 8 | Equilibrado, escalable | Versátil |
 
-### Clases de salida (se eligen al empezar la run)
+Lectura del balance: **Phantom Guard** es el único tanque real (+40 HP sobre la
+media, DEF duplicada) y paga con la peor velocidad. **Abyss Mage** y
+**Dark Slayer** comparten fragilidad pero por razones distintas — el Mage tiene
+el HP más bajo del juego, el Slayer la DEF más baja. **Beast Hunter** no tiene
+pico: es la clase de entrada.
 
-| Clase | Oxígeno | Integridad | Control | Cargas | Rasgo |
-|---|---|---|---|---|---|
-| **Buzo** | 8 | 5 | 6 | 4 | Balanceada. Default del tutorial |
-| **Lastre** | 5 | 9 | 3 | 3 | Ignora el primer impacto de cada tramo |
-| **Aguja** | 4 | 3 | 9 | 6 | Dash no consume carga bajo 600 m |
-| **Carroñero** | 6 | 6 | 5 | 5 | +40% Chatarra, −20% Núcleos |
+> **Nota:** en el PDF, "Versátil" figura como *debilidad* del Beast Hunter.
+> Hay que decidir si eso significa "no sobresale en nada" o si es un error de
+> tipeo y va en la columna de fortalezas.
 
-## Personajes secundarios
+## NPCs principales
 
-Cada uno tiene un arco de 4 escenas y desbloquea un sistema.
+### LYRA — La Mentora
+**Cazadora retirada · C-rank**
 
-### 1. **Vey** — Mecánica del Ancla
-- **Rol:** upgrades de tabla, voz del jugador cuando el jugador no la tiene
-- **Actitud:** práctica, seca, sin ironía. Nunca pregunta cómo estás
-- **Arco:** repara tablas de gente que no vuelve y las revende. Su arco es
-  admitir que reconoce las tuyas
-- **Desbloquea:** rama de upgrades avanzados (Quilla III+)
-- **Visual:** brazos con injertos de metal Despierto — funcionales, no cool
+Te encuentra en el Acto I, después del ataque a tu aldea, y te enseña qué son
+los Cazadores. No es solo tutorial: **descubre los secretos junto con vos**, no
+antes que vos. En el Acto IV es quien revela la existencia de la Gildía Oscura.
 
-### 2. **Idris Mor** — Contratista del Consorcio
-- **Rol:** da las cuotas. Antagonista de sistema, no de combate
-- **Actitud:** cordial, exacto, **nunca miente de forma verificable**
-- **Arco:** de empleador a cómplice a testigo. Nunca se disculpa
-- **Desbloquea:** contratos (misiones con modificadores de run)
-- **Visual:** el único personaje que nunca se moja. Traje seco, impecable
+Es C-rank: **está muy por debajo del jugador en la segunda mitad del juego**.
+Eso es material dramático, no un descuido — la mentora se queda atrás.
 
-### 3. **Halla** — Sin Lastre
-- **Rol:** primera voz que dice que el Surge no es un recurso
-- **Actitud:** calma total. No recluta, invita
-- **Arco:** aparece a 800 m sin equipo de ascenso. Está bien. Eso es lo perturbador
-- **Desbloquea:** ruta de Corrupción alta — habilidades que requieren Corrupción 50+
-- **Visual:** sin casco. Los ojos ya no reflejan luz
+### KAEL — Rival / Espejo
+**Cazador Despierto · igual a vos**
 
-### 4. **Ocho** — Otro Surfista
-- **Rol:** compañero del tutorial. Muere al final del Acto I
-- **Actitud:** ruidoso, imprudente, el único que se ríe
-- **Arco:** post-mortem. Aparece como **Naufragio** en runs de otros jugadores.
-  Su tabla es un ítem recuperable con su nombre
-- **Desbloquea:** el sistema de Naufragios, diegéticamente
-- **Visual:** tabla pintada a mano, la única con color no institucional
+Aparece en el Acto II como rival. Comparten una **conexión extraña con el
+Abismo** que ninguno de los dos entiende.
 
-## Enemigos
+Es literalmente tu espejo: mismo origen, misma condición. Todo lo que el Acto V
+revela sobre vos aplica también a él. Es capturado en el Acto IV.
 
-### Ambientales (no persiguen)
-| Nombre | Tramo | Comportamiento |
+### VEX — Voz del Abismo
+**Inteligencia cósmica**
+
+Te habla **en sueños**, desde el Acto II. Guía misteriosa.
+
+Nunca se aclara si dice la verdad. Dado el giro del Acto V —sos parte del
+Abismo— Vex no te está guiando desde afuera: te está hablando desde adentro.
+
+### VOR — Antagonista
+**Líder de la Gildía Oscura · S-rank**
+
+Busca **esclavizar al Abismo**, no destruirlo. Boss final del Acto V.
+
+El conflicto es **ideológico**. Vor y el jugador están resolviendo el mismo
+problema por caminos distintos, y el juego no le da un motivo barato.
+
+## Progresión visual del jugador
+
+Ocho rangos: **E → D → C → B → A → S → SS → SSS**
+
+Al subir de rango:
+- Suben las estadísticas base
+- Se desbloquean mazmorras nuevas
+- **El personaje cambia visualmente: el aura crece y se vuelve más oscura**
+
+El aura es el indicador de progresión más visible del juego. Un jugador tiene
+que poder leer el rango de otro **de un vistazo**, sin UI.
+
+## Evolución de poderes
+
+Los poderes no se mejoran con niveles: **evolucionan**, y cada salto cambia lo
+que el poder hace.
+
+Cadena de ejemplo (Dark Slayer):
+
+| Etapa | Poder | Efecto |
 |---|---|---|
-| **Velas** | 0–200 m | Medusas a la deriva. Daño por contacto, patrón fijo |
-| **Columnas** | 200–600 m | Chorros térmicos verticales. Telegrafiados 0.8 s antes |
-| **Mallas** | 600–1200 m | Redes de coral Despierto. Ralentizan y drenan Oxígeno |
+| 1 | **Golpe Sombra** | 1.0× daño |
+| 2 | **Cortadura Abismo** | 1.8× daño + crítico |
+| 3 | **Tornada Oscura** | 2.5× daño en AoE |
+| 4 | **Invocación Espectros** | Summon |
 
-### Despiertos (persiguen)
-| Nombre | Tramo | Comportamiento |
-|---|---|---|
-| **Boya** | 400 m+ | Metal reanimado. Lento, imparable, bloquea rutas |
-| **Grúa** | 800 m+ | Brazo de puerto. Ataca el eje de deriva del jugador |
-| **Casco** | 1200 m+ | Un barco entero. Encuentro-arena, no esquivable |
+Cada evolución requiere **desafíos especiales + esencia + oro**. No se compra
+con gemas — ver la filosofía de monetización en [GAME_MECHANICS.md](GAME_MECHANICS.md).
 
-**Regla de diseño:** ningún enemigo tiene ojos ni cara. El Surge anima
-estructuras, no crea criaturas. La única cara en el abismo es la del jugador.
-
-## Guía de arte (personajes)
-
-- **Paleta:** cian → verde abisal → ámbar de emergencia. Rojo **solo** para daño
-- **Silueta antes que detalle** — se juega en pantallas de 6", legibilidad primero
-- **La luz siempre viene de abajo.** El Surge ilumina, la superficie no llega
-- Especificaciones de export y tamaños: [Design/Characters/README.md](Design/Characters/README.md)
+Loadout en combate: **4 poderes activos + 2 pasivos**. Categorías: magia,
+defensa, summons, control.
 
 ## Pendientes
 
-- [ ] ¿El jugador tiene nombre o lo elige?
-- [ ] Arcos de 4 escenas escritos para Vey, Idris, Halla
-- [ ] Diseño de voz: ¿hay VO o todo texto?
-- [ ] Set de emotes para el multijugador asíncrono
+- [ ] Cadenas de evolución de las otras 3 clases (solo está la del Slayer)
+- [ ] Diseño visual del aura para los 8 rangos
+- [ ] ¿"Versátil" es fortaleza o debilidad del Beast Hunter?
+- [ ] Curva de stats por rango — el PDF dice que suben, no cuánto
+- [ ] Retratos y expresiones de los 4 NPCs
+- [ ] ¿Los NPCs tienen mecánica además de narrativa? (Lyra como vendor, Kael
+      como duelo recurrente, etc.)
+- [ ] Diseño de los enemigos de mazmorra — el PDF no los menciona
+
+Specs de export y assets: [Design/Characters/README.md](Design/Characters/README.md)

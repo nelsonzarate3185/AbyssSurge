@@ -1,76 +1,114 @@
-# AbyssSurge — Trama
+# Abyss Surge — Trama
 
-> **Borrador v0.** Concepto inicial derivado del nombre del proyecto.
-> Reemplazá o corregí libremente: esto es un punto de partida, no canon.
+> **Fuente:** [Docs/Abyss_Surge_Trama_y_Personajes.pdf](Docs/Abyss_Surge_Trama_y_Personajes.pdf)
+> (Nelson Zarate, 27/08/2026). Este documento transcribe y estructura ese PDF.
+> Reemplaza por completo el borrador especulativo anterior.
 
-## Premisa
+**Abyss Surge — *Rise from the Darkness***
 
-El océano dejó de comportarse como océano.
+| | |
+|---|---|
+| **Género** | RPG estratégico mobile |
+| **Referencias** | Clash of Clans (estrategia) + Solo Leveling (narrativa) + estética anime |
+| **Plataformas** | Android + iOS |
+| **Stack** | Unity + Supabase + MercadoPago Paraguay |
+| **Duración de campaña** | ~12 horas |
 
-Hace once años, una fractura en la corteza abisal —**la Grieta**— empezó a
-bombear una sustancia luminiscente hacia la superficie: el **Surge**. Donde el
-Surge toca materia viva, la reescribe. Donde toca metal, lo despierta.
+## Visión
 
-Las ciudades costeras que sobrevivieron se reconstruyeron sobre plataformas
-flotantes ancladas a los restos de sus propios rascacielos. Se llaman **Anclas**.
-La humanidad ya no navega: *desciende*.
+El jugador encarna un **Cazador Despierto** que gana poder explorando mazmorras
+oscuras, evolucionando habilidades y compitiendo en clanes.
 
-El jugador es un **Surfista** (*Surger*): un buzo-piloto que baja a la Grieta
-en tablas presurizadas para extraer núcleos de Surge antes de que la marea los
-disuelva. Es el único recurso que mantiene las Anclas a flote.
+Los tres pilares:
 
-## Conflicto central
+- **Narrativa épica** — progresión de rango al estilo Solo Leveling
+- **Mecánica estratégica** — clanes, ciudadela, guerras al estilo Clash of Clans
+- **Estética anime** — el personaje cambia visualmente al subir de rango
 
-Cada descenso reescribe un poco al Surfista. La misma sustancia que lo mantiene
-vivo bajo presión es la que lo está convirtiendo en algo que ya no puede volver
-a la superficie.
+## El mundo: Aetheron
 
-La pregunta del juego: **¿cuánto bajás antes de no poder subir?**
+Continente fragmentado hace **1000 años** por **El Abismo**: una entidad cósmica
+oscura que generó mazmorras que consumen pueblos enteros.
 
-## Facciones
+Frente a eso, algunos humanos **despertaron** poderes para defenderse. Son los
+Cazadores.
 
-| Facción | Qué quiere | Relación con el jugador |
-|---|---|---|
-| **El Consorcio de Anclas** | Extracción estable, cuotas, control de precios | Empleador inicial. Paga bien, miente siempre |
-| **Los Sin Lastre** (*Ballastless*) | Descender sin volver — abrazar el Surge | Antagonistas al inicio, aliados posibles |
-| **Corriente Fría** | Sellar la Grieta aunque las Anclas se hundan | Facción de late-game |
-| **Los Despiertos** | No es una facción. Es lo que el metal se volvió | Enemigos ambientales |
+El jugador es un Cazador Despierto **sin memoria**. No sabe quién era. Lo único
+que siente es la **compulsión del Abismo llamándolo**.
 
-## Estructura narrativa
+Esa compulsión es la premisa: el juego no te pregunta si querés bajar. Ya estás
+bajando.
 
-### Acto I — Superficie (Zonas 1–3)
-Tutorial diegético. El jugador es un Surfista nuevo del Consorcio. Aprende a
-descender, extraer y volver antes de que suba la marea. Termina cuando su
-primer compañero **no** vuelve.
+## Narrativa — 6 actos
 
-### Acto II — Termoclina (Zonas 4–7)
-El Surge empieza a mostrar patrón, no ruido. El jugador descubre que las cuotas
-del Consorcio están calibradas para que los Surfistas se degraden a un ritmo
-predecible. Primer contacto real con los Sin Lastre.
+### Acto I · El Llamado del Abismo
+**0–30 min · Rango E**
 
-**Punto de giro:** el jugador puede seguir extrayendo para el Consorcio o
-empezar a desviar núcleos. La elección cambia qué zonas se desbloquean.
+Tu aldea es atacada. **Lyra** te encuentra entre los restos. Despertás tu poder
+por primera vez.
 
-### Acto III — La Grieta (Zonas 8–12)
-El descenso final. Se revela que la Grieta no es una fractura geológica: es una
-**herida**, y algo del otro lado la está manteniendo abierta a propósito.
+Es el tutorial: combate básico, primera mazmorra, primer rango.
 
-### Finales
-1. **Ascenso** — sellás la Grieta. Las Anclas se hunden. Sobrevivís humano.
-2. **Marea** — dejás la Grieta abierta. Las Anclas flotan. Ya no sos humano.
-3. **Equilibrio** *(oculto)* — requiere completar los arcos de los cuatro
-   personajes secundarios. Ni sellás ni abrís: te quedás en el umbral.
+### Acto II · Clanes y Competencia
+**30 min – 2 h · Rango D**
 
-## Tono y referencias
+Se abre la capa estratégica. Conocés a **Kael**, que se presenta como rival.
+**Vex** te habla por primera vez —en sueños—. Se desbloquean las **Clan Wars**.
 
-- Presión, claustrofobia y luz artificial. Nunca terror sobrenatural explícito.
-- El horror es **económico** antes que biológico: la cuota es el monstruo.
-- Referencias de tono: *Subnautica* (aislamiento), *Outer Wilds* (revelación
-  como progresión), *Return of the Obra Dinn* (verdad reconstruida a pedazos).
+### Acto III · Misterios en Profundidades
+**2 – 5 h · Rango B**
 
-## Pendientes
+Cazadores empiezan a desaparecer en las mazmorras. Vas juntando **fragmentos de
+verdad** sobre qué es realmente el Abismo y qué tenés que ver vos.
 
-- [ ] Nombres propios de las 12 zonas
-- [ ] Arcos individuales de los 4 personajes secundarios (ver [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md))
-- [ ] Cómo se entrega la narrativa: ¿logs, diálogo en base, ambiental?
-- [ ] Definir si el final 3 es alcanzable en una sola run o requiere NG+
+### Acto IV · El Ritual Oscuro
+**5 – 8 h · Rango A**
+
+**Lyra** revela la existencia de la **Gildía Oscura**. **Kael** es capturado.
+El conflicto deja de ser contra el Abismo y pasa a ser contra quienes quieren
+usarlo.
+
+### Acto V · Verdad Abismal
+**8 – 10 h · Rango S**
+
+Batalla contra **Vor**. Y la revelación que sostiene todo el juego:
+
+> **Vos sos parte del Abismo.**
+
+No sos un humano que despertó poderes. Sos otra cosa, y la falta de memoria del
+Acto I deja de ser una laguna para volverse una respuesta.
+
+### Acto VI · Nuevo Orden
+**10 – 12 h · Final ramificado**
+
+| Final | |
+|---|---|
+| **Unión** | |
+| **Sacrificio** | |
+| **Nuevo Líder** | |
+| **Final Secreto** | Condiciones de desbloqueo sin definir |
+
+## Antagonista
+
+**Vor**, líder de la **Gildía Oscura** (S-rank). No quiere destruir el Abismo:
+quiere **esclavizarlo**. Es el boss final y el conflicto con él es **ideológico**,
+no de supervivencia — está resolviendo el mismo problema que vos, por un camino
+que no aceptás.
+
+Detalle completo de todos los personajes: [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md)
+
+## Huecos del documento fuente
+
+El PDF es un resumen ejecutivo. Estos puntos no están definidos y hacen falta
+antes de escribir guion:
+
+- [ ] **El rango C no aparece en la narrativa.** El Acto II termina en D y el
+      Acto III arranca en B. ¿Es grind opcional entre actos o falta un beat?
+- [ ] **Los rangos SS y SSS existen en progresión pero no en la trama.** La
+      campaña termina en S (Acto V). ¿Endgame post-campaña?
+- [ ] **Los tres primeros finales no tienen descripción**, solo nombre
+- [ ] **Condiciones del Final Secreto** sin definir
+- [ ] **El arco de Kael no cierra en el documento** — es capturado en el Acto IV
+      y no se dice qué pasa
+- [ ] **Vex nunca se explica.** Guía al jugador pero no se aclara si miente
+- [ ] Cómo se entrega la narrativa: ¿cinemáticas, diálogo en la base, logs?

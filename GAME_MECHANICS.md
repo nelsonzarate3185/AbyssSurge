@@ -1,6 +1,47 @@
 # AbyssSurge — Sistemas de juego
 
-> **Borrador v0.** Números marcados como `[TUNE]` son placeholders para balance.
+> ## ⚠️ ESTE DOCUMENTO DESCRIBE OTRO JUEGO
+>
+> Todo lo que sigue es un borrador especulativo escrito **antes** de que
+> apareciera [Docs/Abyss_Surge_Trama_y_Personajes.pdf](Docs/Abyss_Surge_Trama_y_Personajes.pdf),
+> y describe un roguelite de descenso vertical que **no es Abyss Surge**.
+>
+> El juego real es un **RPG estratégico mobile** (Clash of Clans + Solo Leveling):
+> combate isométrico de 30–60 s, mazmorras de 3 pisos + jefe, rangos E→SSS,
+> clanes de hasta 50 miembros con Clan Wars, energía y gemas.
+> Ver [STORY.md](STORY.md) y [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md), que ya
+> están reescritos desde el PDF.
+>
+> **No implementes nada de este archivo.** Queda solo para no perder el trabajo
+> hasta que se reescriba. Lo mismo aplica al schema de
+> [Supabase/migrations/](Supabase/migrations/), a los scripts de
+> [Unity/Assets/Scripts/](Unity/Assets/Scripts/) y a [Docs/](Docs/): están
+> construidos sobre esta premisa equivocada.
+
+---
+
+## Sistemas del juego real (del PDF)
+
+| Sistema | Resumen |
+|---|---|
+| **Combate** | Isométrico, 30–60 s. Los enemigos avanzan; seleccionás poder; esquivás tocando el lado opuesto. Ganás esencia |
+| **Loadout** | 4 poderes activos + 2 pasivos (magia, defensa, summons, control) |
+| **Mazmorras** | 3 pisos + 1 jefe. Tipos: Historia, Grind, Despertar, Clan. Dificultades: Normal / Hard / Imposible. Costo: 10 energía |
+| **Rangos** | E → D → C → B → A → S → SS → SSS. Suben stats, desbloquean mazmorras, cambian el aura |
+| **Poderes** | Evolucionan (no suben de nivel). Requieren desafíos especiales + esencia + oro |
+| **Clanes** | Máx. 50 miembros. Roles: Líder, Capitanes, Oficiales. Ciudadela con defensor. Clan Wars cada 3 días |
+| **Monedas** | Oro y esencia (juego) · Gemas (premium) |
+| **Monetización** | Gemas: 100G=$0.99 / 500G=$4.99 / 1200G=$9.99. Usos: 10G refill energía, 50G revivir, 500G skins, 1000G Battle Pass mensual |
+| **Filosofía** | **Sin pay2win.** Cosmético puro; un F2P puede ganarle a un premium |
+| **Pagos** | MercadoPago Paraguay |
+
+Esto es un índice, no una especificación. Falta desarrollarlo: curvas de EXP por
+rango, regeneración de energía, fórmulas de daño, matchmaking de Clan Wars,
+economía de esencia/oro.
+
+---
+
+## Borrador descartado (roguelite de descenso)
 
 ## Género y loop
 
