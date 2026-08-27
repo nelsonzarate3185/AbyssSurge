@@ -1,0 +1,32 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 960, "title": "Clases jugables" },
+    { "file": "NPCs.dc.html", "x": 0, "y": 1080, "w": 1440, "h": 900, "title": "Personajes principales" },
+    { "file": "Finales.dc.html", "x": 0, "y": 2100, "w": 1440, "h": 1000, "title": "Los cuatro finales" },
+    { "file": "Rangos.dc.html", "x": 0, "y": 3220, "w": 1680, "h": 700, "title": "Rangos y aura", "is_interactive": true }
+  ],
+  "annotations": [
+    {
+      "id": "fuente",
+      "x": 1560,
+      "y": 0,
+      "w": 300,
+      "text": "Del PDF: stats, roles, nombres de los actos y de los cuatro finales.\n\nPropuesta: siluetas, paleta, tipografía, y el contenido de los huecos que el PDF dejaba abiertos."
+    },
+    {
+      "id": "resueltos",
+      "x": 1560,
+      "y": 1080,
+      "w": 300,
+      "text": "Cuatro huecos, cerrados:\n\n· \"Versátil\" es fortaleza → la debilidad del Beast Hunter pasa a ser \"Sin pico\"\n· Kael no es rehén: es la prueba de concepto de Vor\n· Los cuatro finales, desarrollados\n· C es el rango de Lyra; SS y SSS son post-campaña"
+    },
+    {
+      "id": "kael-eje",
+      "x": 1560,
+      "y": 2100,
+      "w": 300,
+      "text": "Kael es la moneda de los cuatro finales.\n\nSe funde, te recuerda, sigue atado o se queda del otro lado. Es la única variable que cambia en los cuatro, y por eso el Acto IV tiene que hacerte quererlo."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

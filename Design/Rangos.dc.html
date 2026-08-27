@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Chakra Petch', system-ui, sans-serif; }
+    a { color: #C77DFF; } a:hover { color: #E0AAFF; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 1680px; min-height: 700px; box-sizing: border-box; padding: 52px 64px 48px; background: #08060F; background-image: radial-gradient(110% 80% at 78% 40%, #1E1136 0%, #08060F 60%); color: #E9E4F5; display: flex; flex-direction: column; gap: 34px;">
+
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 40px;">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div class="mono" style="font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase; color: #8B7BB8;">Abyss Surge · Progresión</div>
+      <div style="font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -0.01em;">Rangos y aura</div>
+      <div style="font-size: 16px; color: #9E93BF; max-width: 720px; text-wrap: pretty;">Ocho rangos. Al subir, el aura <strong style="color: #E9E4F5; font-weight: 600;">crece y se vuelve más oscura</strong>, y la silueta del cazador se pierde adentro.</div>
+    </div>
+    <div class="mono" style="font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #6F6490; text-align: right; line-height: 1.9; border: 1px solid #2B2145; padding: 12px 16px;">
+      <div style="color: #8B7BB8;">Legibilidad objetivo</div>
+      <div>Leer el rango de otro jugador<br>de un vistazo, sin UI</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 16px;">
+    <sc-for list="{{ranks}}" as="r" hint-placeholder-count="8">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 0;">
+
+        <div style="position: relative; height: 214px; width: 100%; display: flex; align-items: center; justify-content: center;">
+          <div style="position: absolute; border-radius: 50%; width: {{r.auraPx}}px; height: {{r.auraPx}}px; background: {{r.auraBg}};"></div>
+          <div style="position: absolute; border-radius: 50%; width: {{r.corePx}}px; height: {{r.corePx}}px; background: {{r.coreBg}};"></div>
+          <svg width="62" height="78" viewBox="0 0 120 150" fill="{{r.figColor}}" style="position: relative;">
+            <circle cx="60" cy="44" r="15"/>
+            <path d="M60 60 L35 71 L27 98 L31 140 L89 140 L93 98 L85 71 Z"/>
+            <path d="M35 71 L21 84 L30 90 Z"/><path d="M85 71 L99 84 L90 90 Z"/>
+          </svg>
+        </div>
+
+        <div style="width: 100%; border-top: 1px solid {{r.ruleColor}}; padding-top: 14px; display: flex; flex-direction: column; align-items: center; gap: 10px;">
+          <div class="mono" style="font-size: 30px; font-weight: 600; line-height: 1; letter-spacing: 0.02em; color: {{r.color}};">{{r.label}}</div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+            <div class="mono" style="font-size: 11px; color: #9E93BF;">{{r.exp}}</div>
+            <div class="mono" style="font-size: 10px; letter-spacing: 0.1em; color: #6F6490;">EXP acumulada</div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: baseline;">
+            <span class="mono" style="font-size: 13px; font-weight: 600; color: #C4BADF;">{{r.mult}}</span>
+            <span class="mono" style="font-size: 10px; letter-spacing: 0.1em; color: #6F6490;">STATS</span>
+          </div>
+        </div>
+
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display: flex; gap: 48px; border-top: 1px solid #1D1730; padding-top: 24px;">
+    <div style="display: flex; flex-direction: column; gap: 6px; max-width: 620px;">
+      <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #6F6490;">Cómo lo resuelve el cliente</div>
+      <div style="font-size: 14px; line-height: 1.6; color: #9E93BF; text-wrap: pretty;">El aura sale de dos columnas de <span class="mono" style="color: #C4BADF;">rank_tiers</span>: <span class="mono" style="color: #C4BADF;">aura_scale</span> (1.00 → 2.80) y <span class="mono" style="color: #C4BADF;">aura_darkness</span> (0.00 → 1.00). Unity no tiene lógica propia de aura: lee esos dos números y los aplica.</div>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; max-width: 620px;">
+      <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #6F6490;">Dónde cae cada rango</div>
+      <div style="font-size: 14px; line-height: 1.6; color: #9E93BF; text-wrap: pretty;">La campaña va de <span class="mono" style="color: #C4BADF;">E</span> a <span class="mono" style="color: #C4BADF;">S</span>. <span class="mono" style="color: #C4BADF;">C</span> es el rango de Lyra: su Prueba de Ascenso es el único beat con nombre propio. <span class="mono" style="color: #C4BADF;">SS</span> abre La Cicatriz —mazmorras que dependen del final que elegiste— y <span class="mono" style="color: #C4BADF;">SSS</span> desbloquea el quinto final. Las curvas de EXP son provisorias.</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"auraScale":{"editor":"range","default":1,"min":0.6,"max":1.4,"step":0.05,"unit":"×","section":"Aura"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    var k = this.props.auraScale ?? 1;
+
+    // Fuente: Supabase/migrations/007_reference_data.sql, tabla rank_tiers.
+    var tiers = [
+      { label: 'E',   exp: 0,      mult: 1.00, scale: 1.00, dark: 0.00, color: '#6E6A80' },
+      { label: 'D',   exp: 1000,   mult: 1.25, scale: 1.15, dark: 0.10, color: '#7F5AF0' },
+      { label: 'C',   exp: 3500,   mult: 1.55, scale: 1.30, dark: 0.22, color: '#9D4EDD' },
+      { label: 'B',   exp: 9000,   mult: 1.90, scale: 1.50, dark: 0.36, color: '#B75CFF' },
+      { label: 'A',   exp: 20000,  mult: 2.35, scale: 1.75, dark: 0.52, color: '#CF5CFF' },
+      { label: 'S',   exp: 45000,  mult: 2.90, scale: 2.00, dark: 0.68, color: '#E85AD9' },
+      { label: 'SS',  exp: 100000, mult: 3.60, scale: 2.35, dark: 0.85, color: '#F77FE8' },
+      { label: 'SSS', exp: 250000, mult: 4.50, scale: 2.80, dark: 1.00, color: '#FFFFFF' }
+    ];
+
+    // La silueta se oscurece a medida que el aura la devora.
+    function fig(dark) {
+      var from = [138, 131, 151], to = [6, 4, 12];
+      var c = from.map(function (v, i) { return Math.round(v + (to[i] - v) * dark); });
+      return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+    }
+
+    return {
+      ranks: tiers.map(function (t) {
+        var aura = Math.round(44 * t.scale * k);
+        return {
+          label: t.label,
+          color: t.color,
+          ruleColor: t.dark > 0.5 ? '#3A2A5E' : '#241B3A',
+          exp: t.exp === 0 ? 'inicial' : t.exp.toLocaleString('es-PY'),
+          mult: '×' + t.mult.toFixed(2),
+          auraPx: aura,
+          corePx: Math.round(aura * 0.66),
+          auraBg: 'radial-gradient(circle, ' + t.color + 'D9 0%, ' + t.color + '4D 46%, ' + t.color + '00 71%)',
+          coreBg: 'radial-gradient(circle, rgba(4,2,10,' + t.dark.toFixed(2) + ') 0%, rgba(4,2,10,0) 74%)',
+          figColor: fig(t.dark)
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

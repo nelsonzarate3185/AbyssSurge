@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: 'Chakra Petch', system-ui, sans-serif; }
+    a { color: #C77DFF; } a:hover { color: #E0AAFF; }
+    .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="width: 1440px; min-height: 900px; box-sizing: border-box; padding: 56px 64px; background: #08060F; background-image: radial-gradient(120% 70% at 50% -10%, #1B1030 0%, #08060F 62%); color: #E9E4F5; display: flex; flex-direction: column; gap: 38px;">
+
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 32px;">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div class="mono" style="font-size: 12px; letter-spacing: 0.32em; text-transform: uppercase; color: #8B7BB8;">Abyss Surge · Dramatis personae</div>
+      <div style="font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -0.01em;">Personajes principales</div>
+      <div style="font-size: 16px; color: #9E93BF; max-width: 680px; text-wrap: pretty;">Cuatro NPCs, cada uno con un arco a lo largo de los seis actos.</div>
+    </div>
+    <div class="mono" style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #6F6490; text-align: right; border: 1px solid #2B2145; padding: 10px 14px; line-height: 1.8;">
+      <div style="color: #8B7BB8;">Siluetas = placeholder</div>
+      <div>Marcan pose y masa,<br>no diseño final</div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px;">
+
+    <!-- LYRA -->
+    <div style="display: flex; flex-direction: column; background: #100C1C; border: 1px solid #241B3A;">
+      <div style="position: relative; height: 208px; background: #0B0814; background-image: radial-gradient(80% 70% at 50% 78%, rgba(232,168,124,0.16) 0%, rgba(11,8,20,0) 70%); display: flex; align-items: flex-end; justify-content: center; border-bottom: 1px solid #241B3A;">
+        <div class="mono" style="position: absolute; top: 12px; left: 14px; font-size: 9px; letter-spacing: 0.2em; color: #E8A87C;">C-RANK</div>
+        <svg width="120" height="150" viewBox="0 0 120 150" fill="#E8A87C" style="opacity: 0.9;">
+          <circle cx="60" cy="46" r="15"/>
+          <path d="M60 62 C41 64 29 79 25 104 L21 140 L99 140 L95 104 C91 79 79 64 60 62 Z"/>
+          <path d="M60 26 C46 26 39 38 41 53 L46 48 C46 36 52 32 60 32 C68 32 74 36 74 48 L79 53 C81 38 74 26 60 26 Z"/>
+        </svg>
+      </div>
+      <div style="padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1;">
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 26px; font-weight: 700; letter-spacing: 0.05em; line-height: 1;">LYRA</div>
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #E8A87C;">La Mentora · Cazadora retirada</div>
+        </div>
+        <div style="font-size: 14px; line-height: 1.55; color: #A79CC7; text-wrap: pretty;">Te encuentra entre los restos de tu aldea. Administra la Prueba de Ascenso a C: el único momento del juego en que están a la par.</div>
+        <div style="margin-top: auto; border-top: 1px solid #1D1730; padding-top: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div class="mono" style="font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: #6F6490;">Nota de diseño</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #C4BADF; text-wrap: pretty;">El salto a B la deja atrás para siempre. No hace falta decirlo con un diálogo: a partir de ahí se queda en la puerta.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- KAEL -->
+    <div style="display: flex; flex-direction: column; background: #100C1C; border: 1px solid #241B3A;">
+      <div style="position: relative; height: 208px; background: #0B0814; background-image: radial-gradient(80% 70% at 50% 78%, rgba(201,209,232,0.14) 0%, rgba(11,8,20,0) 70%); display: flex; align-items: flex-end; justify-content: center; border-bottom: 1px solid #241B3A;">
+        <div class="mono" style="position: absolute; top: 12px; left: 14px; font-size: 9px; letter-spacing: 0.2em; color: #C9D1E8;">= JUGADOR</div>
+        <svg width="120" height="150" viewBox="0 0 120 150" style="opacity: 0.9;">
+          <g fill="#C9D1E8" opacity="0.22" transform="translate(11,0) scale(-1,1) translate(-120,0)">
+            <circle cx="60" cy="44" r="15"/>
+            <path d="M60 60 L35 71 L27 98 L31 140 L89 140 L93 98 L85 71 Z"/>
+            <path d="M35 71 L21 84 L30 90 Z"/><path d="M85 71 L99 84 L90 90 Z"/>
+          </g>
+          <g fill="#C9D1E8">
+            <circle cx="60" cy="44" r="15"/>
+            <path d="M60 60 L35 71 L27 98 L31 140 L89 140 L93 98 L85 71 Z"/>
+            <path d="M35 71 L21 84 L30 90 Z"/><path d="M85 71 L99 84 L90 90 Z"/>
+          </g>
+        </svg>
+      </div>
+      <div style="padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1;">
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 26px; font-weight: 700; letter-spacing: 0.05em; line-height: 1;">KAEL</div>
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #C9D1E8;">Rival · Espejo</div>
+        </div>
+        <div style="font-size: 14px; line-height: 1.55; color: #A79CC7; text-wrap: pretty;">Aparece en el Acto&nbsp;II como rival. Capturado en el Acto&nbsp;IV — y cuando llegás a rescatarlo, <strong style="color: #E9E4F5; font-weight: 600;">no quiere que lo liberes</strong>.</div>
+        <div style="margin-top: auto; border-top: 1px solid #1D1730; padding-top: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div class="mono" style="font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: #6F6490;">Cómo cierra su arco</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #C4BADF; text-wrap: pretty;">No es rehén: es la prueba de concepto de Vor. Nadie lo quebró — le mostraron que el vínculo se sostiene sin devorarte y eligió quedarse.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VEX -->
+    <div style="display: flex; flex-direction: column; background: #100C1C; border: 1px solid #241B3A;">
+      <div style="position: relative; height: 208px; background: #0B0814; background-image: radial-gradient(70% 60% at 50% 50%, rgba(110,231,222,0.16) 0%, rgba(11,8,20,0) 72%); display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #241B3A;">
+        <div class="mono" style="position: absolute; top: 12px; left: 14px; font-size: 9px; letter-spacing: 0.2em; color: #6EE7DE;">SIN CUERPO</div>
+        <svg width="130" height="130" viewBox="0 0 120 120" fill="none" stroke="#6EE7DE" stroke-width="1.6" style="opacity: 0.92;">
+          <circle cx="60" cy="60" r="46" opacity="0.28"/>
+          <circle cx="60" cy="60" r="34" opacity="0.5"/>
+          <circle cx="60" cy="60" r="23" opacity="0.75"/>
+          <path d="M60 33 C74 45 74 75 60 87 C46 75 46 45 60 33 Z" fill="#6EE7DE" stroke="none" opacity="0.16"/>
+          <path d="M60 33 C74 45 74 75 60 87 C46 75 46 45 60 33 Z"/>
+          <circle cx="60" cy="60" r="6" fill="#6EE7DE" stroke="none"/>
+        </svg>
+      </div>
+      <div style="padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1;">
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 26px; font-weight: 700; letter-spacing: 0.05em; line-height: 1;">VEX</div>
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #6EE7DE;">Voz del Abismo · Inteligencia cósmica</div>
+        </div>
+        <div style="font-size: 14px; line-height: 1.55; color: #A79CC7; text-wrap: pretty;">Te habla en sueños desde el Acto&nbsp;II. Guía misteriosa. Nunca se aclara si dice la verdad.</div>
+        <div style="margin-top: auto; border-top: 1px solid #1D1730; padding-top: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div class="mono" style="font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: #6F6490;">Nota de diseño</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #C4BADF; text-wrap: pretty;">Dado el giro del Acto&nbsp;V —sos parte del Abismo— Vex no te guía desde afuera: te habla desde adentro.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VOR -->
+    <div style="display: flex; flex-direction: column; background: #100C1C; border: 1px solid #2E1F52; box-shadow: 0 0 60px -26px #7C3AED;">
+      <div style="position: relative; height: 208px; background: #0B0814; background-image: radial-gradient(80% 70% at 50% 78%, rgba(124,58,237,0.30) 0%, rgba(11,8,20,0) 70%); display: flex; align-items: flex-end; justify-content: center; border-bottom: 1px solid #2E1F52;">
+        <div class="mono" style="position: absolute; top: 12px; left: 14px; font-size: 9px; letter-spacing: 0.2em; color: #A78BFA;">S-RANK · BOSS</div>
+        <svg width="126" height="150" viewBox="0 0 120 150" fill="#8B5CF6" style="opacity: 0.95;">
+          <path d="M36 74 L14 50 L24 88 Z"/><path d="M84 74 L106 50 L96 88 Z"/>
+          <circle cx="60" cy="48" r="14"/>
+          <path d="M60 62 L36 74 L28 140 L92 140 L84 74 Z"/>
+          <path d="M60 20 L66 34 L60 30 L54 34 Z"/>
+        </svg>
+      </div>
+      <div style="padding: 22px 24px 24px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1;">
+        <div style="display: flex; flex-direction: column; gap: 3px;">
+          <div style="font-size: 26px; font-weight: 700; letter-spacing: 0.05em; line-height: 1;">VOR</div>
+          <div class="mono" style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #A78BFA;">Antagonista · Líder de la Gildía Oscura</div>
+        </div>
+        <div style="font-size: 14px; line-height: 1.55; color: #A79CC7; text-wrap: pretty;">Busca <strong style="color: #E9E4F5; font-weight: 600;">esclavizar</strong> al Abismo, no destruirlo. Boss final del Acto&nbsp;V.</div>
+        <div style="margin-top: auto; border-top: 1px solid #241B3A; padding-top: 14px; display: flex; flex-direction: column; gap: 5px;">
+          <div class="mono" style="font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: #6F6490;">Nota de diseño</div>
+          <div style="font-size: 13px; line-height: 1.5; color: #C4BADF; text-wrap: pretty;">No gana la discusión: la empata, que para un villano es peor. En el Acto&nbsp;V su tesis está parada al lado suyo, hablando: es Kael.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 28px; border-top: 1px solid #1D1730; padding-top: 22px;">
+    <div class="mono" style="font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: #6F6490; white-space: nowrap;">El eje de los cuatro</div>
+    <div style="font-size: 14px; line-height: 1.6; color: #9E93BF; text-wrap: pretty;">
+      Lyra se queda atrás, Kael se adelanta, Vex mira desde adentro y Vor llega primero. Los cuatro son versiones de la misma pregunta: <strong style="color: #C4BADF; font-weight: 600;">qué hacés con algo que te está llamando.</strong>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

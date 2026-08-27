@@ -18,14 +18,18 @@ on conflict (key) do update set value = excluded.value,
                                 description = excluded.description;
 
 -- ─────────────────────────────────────────────────────────────
--- Clases — valores EXACTOS del PDF §3. No tunear sin actualizar el PDF.
+-- Clases — stats EXACTOS del PDF §3. No tunear sin actualizar el PDF.
+--
+-- Excepción: el PDF listaba "Versátil" como DEBILIDAD del Beast Hunter.
+-- Confirmado con el autor que es fortaleza, así que la clase quedaba sin
+-- debilidad; "Sin pico" es la que se le asignó. Ver CHARACTER_DESIGN.md.
 -- ─────────────────────────────────────────────────────────────
 
 insert into class_archetypes (class, label, base_hp, base_atk, base_def, base_vel, strength, weakness) values
   ('dark_slayer',   'Dark Slayer',   100, 12, 4,  9,  'Daño extremo, velocidad rápida',   'Muy frágil'),
   ('phantom_guard', 'Phantom Guard', 140, 8,  8,  5,  'Durabilidad extrema',              'Daño lento'),
   ('abyss_mage',    'Abyss Mage',    90,  9,  5,  10, 'AoE devastador, maná ilimitado',   'Muy frágil'),
-  ('beast_hunter',  'Beast Hunter',  110, 11, 6,  8,  'Equilibrado, escalable',           'Versátil')
+  ('beast_hunter',  'Beast Hunter',  110, 11, 6,  8,  'Equilibrado, escalable, versátil', 'Sin pico')
 on conflict (class) do update set
   base_hp = excluded.base_hp, base_atk = excluded.base_atk,
   base_def = excluded.base_def, base_vel = excluded.base_vel,
