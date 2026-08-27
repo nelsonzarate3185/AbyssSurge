@@ -19,6 +19,10 @@ help: ## Muestra esta ayuda
 
 ## ─── Base de datos ─────────────────────────────────────────
 
+.PHONY: db-link
+db-link: ## Vincula el repo al proyecto Supabase de AbyssSurge
+	$(SUPA) link --project-ref ocmroiupftpbsukuqvyu
+
 .PHONY: db-start
 db-start: ## Levanta Supabase local (requiere Docker)
 	$(SUPA) start
@@ -56,7 +60,7 @@ fn-deploy: ## Deploy de todas las funciones. Uso: make fn-deploy NAME=submit-run
 
 .PHONY: fn-check
 fn-check: ## Typecheck de las Edge Functions
-	deno check Supabase/functions/**/index.ts
+	deno check Supabase/functions/*/index.ts
 
 ## ─── Calidad ───────────────────────────────────────────────
 

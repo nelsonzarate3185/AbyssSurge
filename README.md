@@ -11,11 +11,14 @@ en Supabase y pagos por MercadoPago Paraguay. Android + iOS.
 > [STORY.md](STORY.md) y [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md) están
 > reescritos desde ese PDF y son válidos.
 >
-> **Todo el resto del scaffold —[GAME_MECHANICS.md](GAME_MECHANICS.md), el
-> schema de [Supabase/](Supabase/), los scripts de [Unity/](Unity/) y
-> [Docs/](Docs/)— se escribió antes de que apareciera el PDF y describe un
-> juego distinto** (un roguelite de descenso vertical). Sirve como andamiaje
-> de estructura, no como especificación. Hay que reescribirlo.
+> El backend de [Supabase/](Supabase/) y el contrato de
+> [Docs/API/](Docs/API/) están reescritos sobre la premisa correcta:
+> cazadores, mazmorras, clanes, rangos y gemas. **Todavía sin ejecutar** —
+> ver "Estado real" en [Supabase/README.md](Supabase/README.md).
+>
+> **Siguen desactualizados:** [GAME_MECHANICS.md](GAME_MECHANICS.md) (tiene un
+> índice de los sistemas reales arriba, pero el cuerpo describe otro juego),
+> los scripts de [Unity/](Unity/) y [Docs/Architecture/](Docs/Architecture/).
 
 ## Estructura del workspace
 
@@ -26,19 +29,22 @@ en Supabase y pagos por MercadoPago Paraguay. Android + iOS.
 | [GAME_MECHANICS.md](GAME_MECHANICS.md) | Índice de sistemas reales + borrador descartado ⚠️ |
 | [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md) | 4 clases jugables, 4 NPCs, rangos, poderes ✅ |
 | [SETUP_CLAUDE_CODE.md](SETUP_CLAUDE_CODE.md) | Cómo trabajar en este repo con Claude Code |
-| [Unity/](Unity/) | Cliente móvil — scripts, escenas, recursos |
-| [Supabase/](Supabase/) | Schema SQL, Edge Functions, seeds |
+| [Unity/](Unity/) | Cliente móvil — scripts, escenas, recursos ⚠️ |
+| [Supabase/](Supabase/) | Schema SQL, Edge Functions, seeds ✅ |
 | [Docs/](Docs/) | Documentación técnica (API, arquitectura) |
 | [Design/](Design/) | Especificaciones y assets visuales |
 
 ## Arranque rápido
 
 ```bash
-cp .env.example .env       # completá las claves de Supabase
+make env                   # crea .env desde .env.example
 make help                  # lista de comandos disponibles
+make db-link               # vincula con el proyecto AbyssSurge en Supabase
 make db-start              # levanta Supabase local (requiere Docker)
 make db-reset              # aplica migrations + seeds
 ```
+
+Proyecto Supabase: **AbyssSurge** · ref `ocmroiupftpbsukuqvyu`
 
 Abrí `AbyssSurge.code-workspace` en VS Code para tener las carpetas separadas.
 

@@ -1,7 +1,7 @@
 # Configuración de Supabase local para AbyssSurge.
 # Docs: https://supabase.com/docs/guides/local-development/cli/config
 
-project_id = "abyss-surge"
+project_id = "AbyssSurge"
 
 [api]
 enabled = true

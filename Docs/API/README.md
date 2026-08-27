@@ -1,8 +1,9 @@
 # Contrato de API
 
-Base URL: `$SUPABASE_URL`
+Base URL: `https://ocmroiupftpbsukuqvyu.supabase.co`
+Project ref: `ocmroiupftpbsukuqvyu`
 
-Todas las llamadas requieren:
+Headers en toda llamada:
 
 ```http
 apikey: <SUPABASE_ANON_KEY>
@@ -17,123 +18,188 @@ La `anon key` es pública por diseño — lo que protege es RLS. La
 
 ## Edge Functions
 
-### `POST /functions/v1/daily-seed`
+### `POST /functions/v1/enter-dungeon`
 
-Devuelve la seed compartida del día. La materializa si no existía.
+Abre un intento de mazmorra. **Acá se cobra la energía.**
 
-**Request:** `{}`
+**Request:**
+```json
+{ "dungeonId": "grind_fisura_menor", "difficulty": "normal" }
+```
+
+`difficulty`: `normal` | `hard` | `impossible` (default `normal`)
 
 **Response `200`:**
 ```json
 {
-  "date": "2026-08-27",
-  "seed": "9f2c4ab1d7e05836",
-  "modifiers": { "name": "riptide", "oxygenMultiplier": 0.85, "lootMultiplier": 1.4 }
+  "sessionId": "9f2c…",
+  "dungeonId": "grind_fisura_menor",
+  "difficulty": "normal",
+  "rankAtEntry": "C",
+  "energySpent": 10,
+  "energyRemaining": 32,
+  "startedAt": "2026-08-27T14:02:11.000Z",
+  "expiresAt": "2026-08-27T14:32:11.000Z"
 }
 ```
 
-El cliente reproduce el nivel localmente con `DeterministicRandom(seed)`.
-La seed **nunca** se genera en el cliente.
+Guardá el `sessionId`: sin él no se puede cerrar el intento.
+
+**Errores:**
+
+| Código | Cuándo |
+|---|---|
+| `401` | Token ausente o inválido |
+| `400` | `invalid dungeonId` / `invalid difficulty` |
+| `402` | `insufficient energy: have N, need M` |
+| `403` | `rank X required for this dungeon` · `rank X required for hard` · `clan membership required` |
+| `404` | Mazmorra inexistente, o el cazador no existe todavía (llamar `bootstrap_hunter` primero) |
+| `409` | `a dungeon session is already open` — hay un intento sin cerrar |
+
+En el `409` la energía **se devuelve**: el cobro y la apertura de sesión no son
+atómicos, así que un doble tap no cuesta 10 de energía.
 
 ---
 
-### `POST /functions/v1/submit-run`
+### `POST /functions/v1/complete-dungeon-run`
 
-Única vía para acreditar una run. Valida antes de tocar la economía.
+Cierra el intento y acredita.
 
 **Request:**
 ```json
 {
-  "seed": "9f2c4ab1d7e05836",
-  "seedDate": "2026-08-27",
-  "class": "diver",
-  "depthMeters": 840,
-  "coresCollected": 34,
-  "scrapCollected": 12,
-  "durationMs": 214000,
-  "outcome": "ascended",
-  "startedAt": "2026-08-27T14:02:11.000Z"
+  "sessionId": "9f2c…",
+  "floorsCleared": 3,
+  "bossDefeated": true,
+  "outcome": "cleared",
+  "durationMs": 184000
 }
 ```
 
 | Campo | Tipo | Notas |
 |---|---|---|
-| `seed` | string | ≥ 8 chars |
-| `seedDate` | string \| omitido | Presente solo en la run diaria |
-| `class` | enum | `diver` \| `ballast` \| `needle` \| `scavenger` |
-| `depthMeters` | int ≥ 0 | Profundidad **máxima** alcanzada, no la final |
-| `outcome` | enum | `ascended` \| `drowned` \| `crushed` \| `abandoned` |
-| `startedAt` | ISO-8601 UTC | Se valida contra el reloj del servidor |
+| `sessionId` | string | El de `enter-dungeon` |
+| `floorsCleared` | int ≥ 0 | Máximo: los pisos de la mazmorra (3) |
+| `bossDefeated` | bool | Requiere haber limpiado todos los pisos |
+| `outcome` | enum | `cleared` \| `failed` \| `abandoned` |
+| `durationMs` | int > 0 | Duración real del intento |
 
 **Response `200`:**
 ```json
 {
   "runId": "0f8b…",
-  "credited": true,
-  "coresAwarded": 34,
-  "scrapAwarded": 12,
-  "corruptionGained": 0,
-  "wreckLeft": false
+  "outcome": "cleared",
+  "expAwarded": 150,
+  "goldAwarded": 400,
+  "essenceAwarded": 25,
+  "hunter": { "rank": "B", "exp": 9150, "gold": 5400, "essence": 825, "story_act": 3 }
 }
 ```
 
-> **La respuesta es la verdad.** Lo que el cliente calculó durante la run es
-> feedback visual; el estado real del jugador es lo que devuelve este endpoint.
+> **La respuesta es la verdad.** Lo que el cliente calculó durante el combate
+> es feedback visual. El `hunter` que vuelve acá ya incluye una promoción de
+> rango si la hubo.
 
 **Errores:**
 
-| Código | Cuándo | `error` |
-|---|---|---|
-| `401` | Token ausente o inválido | `missing bearer token` / `invalid token` |
-| `400` | Payload malformado | `invalid <campo>` |
-| `405` | Método distinto de POST | `method not allowed` |
-| `409` | Ya jugó la seed diaria de hoy | mensaje de Postgres (unique violation) |
-| `422` | Falló una validación anti-cheat | ver tabla siguiente |
-| `500` | Error de acreditación | mensaje de Postgres |
+| Código | Cuándo |
+|---|---|
+| `401` | Token inválido |
+| `400` | Payload malformado |
+| `403` | `session belongs to another hunter` |
+| `404` | `session not found` |
+| `409` | `session already consumed` |
+| `410` | `session expired` — pasaron más de 30 min. La energía **no** se devuelve |
+| `422` | Falló una validación de coherencia (abajo) |
 
 **Validaciones que devuelven `422`:**
 
 | Mensaje | Regla |
 |---|---|
-| `run timestamps out of range` | `startedAt + durationMs` fuera de ±`RUN_CLOCK_SKEW_SECONDS` / +6 h |
-| `depth not reachable in declared duration` | `depthMeters > (durationMs/1000) × 34` `[TUNE]` |
-| `cores exceed collector capacity` | `coresCollected > 20 + 12 × nivel_colector` `[TUNE]` |
-| `seed mismatch for daily run` | La `seed` enviada no es la del servidor para esa fecha |
+| `floorsCleared exceeds dungeon floors` | `floorsCleared > dungeons.floors` |
+| `dungeon has no boss` | `bossDefeated` en una mazmorra sin jefe |
+| `boss defeated without clearing all floors` | Jefe sin los 3 pisos |
+| `cleared requires defeating the boss` | `outcome = cleared` sin matar al jefe |
+| `duration too short for the reported progress` | `< 20 s` por encuentro `[TUNE]` |
+| `duration inconsistent with session window` | Más larga que la ventana de la sesión |
 
-**Efectos:**
+**Efectos de `outcome = "cleared"`** (todo en una transacción):
 
-- `outcome = "ascended"` → `credit_run()`: suma núcleos, chatarra, corrupción,
-  actualiza récord y avanza la cuota semanal
-- Cualquier otro outcome con `coresCollected > 0` → se crea un `wreck` abierto
-- Cualquier otro outcome con `coresCollected = 0` → la run queda registrada y nada más
+1. Se consume la sesión
+2. Se registra la run con las recompensas × multiplicador de dificultad
+3. Suma EXP, oro y esencia al cazador
+4. **Promueve de rango** si la EXP alcanza el siguiente `rank_tiers`
+5. Si era mazmorra de historia, cierra el acto y avanza `story_act`
+
+Un `failed` o `abandoned` registra la run con recompensas en 0. La energía ya
+se gastó al entrar y no vuelve.
 
 ---
 
-## RPCs (PostgREST)
+## RPCs
 
 `POST /rest/v1/rpc/<nombre>`
 
-### `bootstrap_player`
-```json
-{ "p_display_name": "Ocho" }
-```
-Crea perfil + los 4 slots de tabla. Idempotente: si ya existe, renombra.
+### Onboarding
 
-### `purchase_upgrade`
+#### `bootstrap_hunter`
 ```json
-{ "p_slot": "collector" }
+{ "p_display_name": "Kael", "p_class": "dark_slayer" }
 ```
-Slots: `hull` \| `regulator` \| `keel` \| `collector`.
-Costo: `100 × (nivel_destino)²` Núcleos. `[TUNE]`
+Clases: `dark_slayer` | `phantom_guard` | `abyss_mage` | `beast_hunter`.
 
-Errores: `insufficient cores: need N`, `slot already at max level`.
+Crea el cazador con energía llena y le da el poder tier 1 de su clase equipado
+en el slot 1. Idempotente en el nombre. **La clase no se puede cambiar después.**
 
-### `claim_wreck`
+#### `current_energy`
 ```json
-{ "p_wreck_id": "0f8b…" }
+{ "p_hunter_id": "<uuid>" }
 ```
-Devuelve `{ "cores_awarded": N }`. El recuperador se lleva el 60%; el dueño
-original recupera el 20%. No se puede reclamar el naufragio propio.
+Devuelve un entero. Leer `hunters.energy` directo da un valor viejo: no incluye
+la regeneración acumulada.
+
+### Poderes
+
+#### `evolve_power`
+```json
+{ "p_power_id": "ds_cortadura_abismo" }
+```
+Requiere: el poder anterior de la cadena, el desafío especial si lo pide, el
+rango mínimo, y esencia + oro suficientes.
+
+El poder anterior **no se pierde** — evolucionar amplía el loadout disponible.
+
+Errores: `missing prerequisite power X`, `challenge X not completed`,
+`rank X required`, `insufficient resources: need N essence, M gold`,
+`power already unlocked`, `power belongs to another class`.
+
+### Gemas
+
+#### `spend_gems`
+```json
+{ "p_sink_id": "energy_refill" }
+```
+
+| Sink | Gemas | Efecto |
+|---|---:|---|
+| `energy_refill` | 10 | Energía al máximo |
+| `revive` | 50 | Sin efecto persistente: lo consume la run en curso |
+| `skin_basic` | 500 | Entitlement permanente |
+| `battle_pass` | 1000 | Entitlement por 30 días |
+
+Devuelve el saldo de gemas restante. Todo movimiento queda en `gem_ledger`.
+
+### Clanes
+
+| RPC | Body | Notas |
+|---|---|---|
+| `create_clan` | `{ p_name, p_tag, p_description }` | El tag se normaliza a mayúsculas. 2–5 caracteres `[A-Z0-9]` |
+| `join_clan` | `{ p_clan_id }` | Valida cupo de 50, rango mínimo y que esté abierto |
+| `leave_clan` | `{}` | El líder debe transferir el liderazgo primero |
+| `set_clan_role` | `{ p_hunter_id, p_role }` | Solo el líder. Asignar `leader` transfiere y degrada al saliente a `captain` |
+| `set_clan_defender` | `{ p_hunter_id }` | Líder y capitanes |
+
+Roles: `leader` | `captain` | `officer` | `member`.
 
 ---
 
@@ -141,19 +207,32 @@ original recupera el 20%. No se puede reclamar el naufragio propio.
 
 | Recurso | Qué devuelve |
 |---|---|
-| `GET /rest/v1/players?select=*` | Solo el perfil propio |
-| `GET /rest/v1/board_upgrades?select=*` | Solo los slots propios |
-| `GET /rest/v1/runs?select=*&order=created_at.desc` | Solo las runs propias |
-| `GET /rest/v1/wrecks?seed=eq.<seed>&recovered_by=is.null` | Naufragios abiertos de otros |
-| `GET /rest/v1/leaderboard_daily?seed_date=eq.<fecha>` | Top de esa seed. No expone `player_id` |
+| `GET /rest/v1/hunters?select=*` | Solo el perfil propio |
+| `GET /rest/v1/hunter_stats?select=*` | Stats efectivos (base × rango) + datos del aura |
+| `GET /rest/v1/hunter_powers?select=*,powers(*)` | Poderes propios con su definición |
+| `GET /rest/v1/dungeons?select=*&order=sort_order` | Catálogo completo |
+| `GET /rest/v1/powers?class=eq.dark_slayer` | Catálogo de poderes de una clase |
+| `GET /rest/v1/dungeon_runs?order=created_at.desc` | Historial propio |
+| `GET /rest/v1/clans?is_open=eq.true` | Todos los clanes — es buscable a propósito |
+| `GET /rest/v1/clan_members?select=*` | Solo los del clan propio |
+| `GET /rest/v1/gem_products?select=*` | Paquetes activos |
+| `GET /rest/v1/gem_ledger?order=created_at.desc` | Movimientos de gemas propios |
 
-`runs` es **solo lectura** para el cliente: no hay policy de `insert`.
+**Escritura desde el cliente:** solo dos columnas en todo el schema.
+
+| Recurso | Columna |
+|---|---|
+| `PATCH /rest/v1/hunters?id=eq.<uid>` | `display_name` |
+| `PATCH /rest/v1/hunter_powers?...` | `loadout_slot` (1–4 activos, 5–6 pasivos) |
+
+Cualquier otra columna es rechazada por el grant, no por la policy.
 
 ---
 
 ## Pendiente
 
-- [ ] Firma HMAC del payload de run además de la validación heurística
-- [ ] Rate limiting por jugador en `submit-run`
-- [ ] Endpoint de fantasmas (trazo de descenso de otro jugador)
-- [ ] Versionado del contrato (`X-AbyssSurge-Client` header)
+- [ ] MercadoPago Paraguay: `create-payment` + `payment-webhook`, productos en PYG
+- [ ] Endpoints de Clan Wars (declarar, atacar, resolver)
+- [ ] Leaderboards
+- [ ] Rate limiting en `enter-dungeon`
+- [ ] Versionado del contrato (`X-AbyssSurge-Client`)

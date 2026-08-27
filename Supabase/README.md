@@ -1,103 +1,190 @@
-# Supabase — Backend de AbyssSurge
+# Supabase — Backend de Abyss Surge
 
-Todo el estado autoritativo del juego vive acá: perfiles, economía,
-runs validadas, naufragios y leaderboards.
+Estado autoritativo del juego: cazadores, progresión, mazmorras, clanes y
+economía de gemas.
+
+| | |
+|---|---|
+| **Proyecto** | AbyssSurge |
+| **Project ref** | `ocmroiupftpbsukuqvyu` |
+| **URL** | `https://ocmroiupftpbsukuqvyu.supabase.co` |
 
 ## Principio de diseño
 
-> **El cliente no decide recompensas.**
+> **El cliente no acredita nada.**
 
-El cliente Unity puede leer lo suyo y llamar tres RPCs acotadas. Todo lo que
-toca la economía pasa por una Edge Function con `service_role` que valida la
-run antes de acreditar. Ver [GAME_MECHANICS.md §9](../GAME_MECHANICS.md).
+El cliente Unity lee lo suyo, ejecuta nueve RPCs acotadas y llama dos Edge
+Functions. Todo lo que suma EXP, oro, esencia, gemas o rango pasa por
+`service_role` después de validar.
+
+Tres capas de defensa, en este orden:
+
+1. **RLS** decide qué **filas** ve cada jugador
+2. **Grants por columna** deciden qué **columnas** puede escribir
+   — RLS no filtra columnas: sin el grant, la policy de `update` sobre
+   `hunters` dejaría al jugador editarse el oro
+3. **Edge Functions** validan la lógica de juego antes de acreditar
 
 ## Setup
 
 ```bash
 npm i -g supabase          # o: scoop install supabase
 supabase login
-supabase link --project-ref <tu-project-ref>
+supabase link --project-ref ocmroiupftpbsukuqvyu
 
 cd ..                      # los comandos corren desde la raíz del repo
-make db-start              # levanta Postgres + Studio + Auth local
+cp .env.example .env       # completá anon key y service role key
+make db-start              # Postgres + Studio + Auth local (necesita Docker)
 make db-reset              # migrations + seeds desde cero
 ```
 
 Studio local: http://127.0.0.1:54323
 
-> **Linux:** el CLI busca `supabase/config.toml` en minúscula. Creá un symlink
-> una vez: `ln -s Supabase supabase`
+> **Linux:** el CLI busca `supabase/config.toml` en minúscula. Symlink una vez:
+> `ln -s Supabase supabase`
 
 ## Estructura
 
 ```
 Supabase/
-├── config.toml            # configuración del stack local
-├── migrations/            # schema versionado — se aplica en orden
-│   ├── 001_initial_schema.sql
-│   ├── 002_rls_policies.sql
-│   ├── 003_rpc.sql
-│   └── 004_credit_run.sql
-├── functions/             # Edge Functions (Deno / TypeScript)
-│   ├── _shared/           # helpers: auth, cors, seed determinista
-│   ├── submit-run/        # valida y acredita una run
-│   └── daily-seed/        # seed compartida del día
+├── config.toml
+├── migrations/
+│   ├── 001_enums_and_reference.sql   enums, catálogos vacíos, game_settings
+│   ├── 002_hunters.sql               perfil, energía, loadout, grants por columna
+│   ├── 003_dungeons.sql              sesiones e historial de mazmorras
+│   ├── 004_clans.sql                 clanes, miembros, Clan Wars
+│   ├── 005_economy.sql               gemas, compras, ledger, entitlements
+│   ├── 006_rpc.sql                   lo que el cliente puede ejecutar
+│   ├── 007_reference_data.sql        el catálogo del juego (también en prod)
+│   └── 008_award_run.sql             acreditación atómica, solo service_role
+├── functions/
+│   ├── _shared/                      auth + cors
+│   ├── enter-dungeon/                cobra energía, abre sesión
+│   └── complete-dungeon-run/         valida y acredita
 └── seeds/
-    └── seed.sql           # datos de desarrollo
+    └── seed.sql                      cazadores de prueba (solo local)
 ```
+
+**El catálogo va en migration, no en seeds.** Clases, rangos, poderes,
+mazmorras y productos hacen falta en producción: sin ellos no se puede crear
+un cazador. `seeds/` es solo para usuarios de prueba locales.
 
 ## Tablas
 
-| Tabla | Quién escribe | Notas |
-|---|---|---|
-| `players` | RPC `bootstrap_player`, funciones server | El cliente solo puede renombrarse |
-| `board_upgrades` | RPC `purchase_upgrade` | Costo `100 × nivel²` `[TUNE]` |
-| `daily_seeds` | Edge Function `daily-seed` | Lectura pública autenticada |
-| `runs` | Edge Function `submit-run` | El cliente **no** inserta |
-| `wrecks` | `submit-run` / RPC `claim_wreck` | 60% al recuperador, 20% al dueño |
-| `quotas` | `credit_run` | Presión narrativa como sistema |
+### Referencia (solo lectura para el cliente)
 
-Vista `leaderboard_daily`: top de las seeds de los últimos 7 días. No expone
-`player_id`.
+| Tabla | Qué define |
+|---|---|
+| `class_archetypes` | Las 4 clases y sus stats base — valores exactos del PDF §3 |
+| `rank_tiers` | E→SSS: EXP requerida, multiplicador de stats, aura |
+| `powers` | Catálogo. Los poderes evolucionan: cada tier es una fila que apunta a la anterior |
+| `dungeons` | 3 pisos + 1 jefe, 10 de energía. Tipos: story, grind, awakening, clan |
+| `difficulty_modifiers` | Normal / Hard / Imposible |
+| `gem_products`, `gem_sinks` | Paquetes y usos de gemas |
+| `game_settings` | Constantes tuneables sin migration |
+
+### Estado del jugador
+
+| Tabla | Quién escribe |
+|---|---|
+| `hunters` | RPCs y Edge Functions. El cliente solo puede tocar `display_name` |
+| `hunter_powers` | `evolve_power()` desbloquea; el cliente solo mueve `loadout_slot` |
+| `dungeon_sessions` | `enter-dungeon` |
+| `dungeon_runs` | `award_dungeon_run()` — el cliente no tiene insert |
+| `power_challenges` | Edge Functions |
+| `story_progress` | `award_dungeon_run()` |
+| `clans`, `clan_members` | RPCs de clan |
+| `clan_wars`, `clan_war_battles` | *(pendiente: el scheduler de guerras)* |
+| `purchases`, `gem_ledger`, `entitlements` | Webhook de pagos y `spend_gems()` |
+
+Vista `hunter_stats`: stats efectivos = base de clase × multiplicador de rango.
+Es `security_invoker = on`, así que hereda la RLS de `hunters`.
+
+## Energía
+
+No hay job de regeneración. `hunters.energy` guarda el último valor
+materializado y `energy_updated_at` cuándo se materializó:
+
+```
+energía vigente = min(máximo, energy + minutos_transcurridos / 6)
+```
+
+`current_energy()` la lee, `spend_energy()` la materializa y descuenta.
+Al gastar se preserva el avance parcial hacia el próximo punto — si no,
+gastar reiniciaría el timer y el jugador perdería progreso.
+
+Defaults: máximo 50, 1 punto cada 6 min (lleno en 5 h). Se tunean en
+`game_settings` sin migration.
+
+## Flujo de una mazmorra
+
+```
+enter-dungeon
+  ├─ valida rango del cazador vs. mazmorra y dificultad
+  ├─ si es mazmorra de clan, valida membresía
+  ├─ cobra energía  (spend_energy)
+  └─ abre dungeon_sessions  → sessionId, expira en 30 min
+
+  ═══ combate offline, 30–60 s por encuentro ═══
+
+complete-dungeon-run
+  ├─ la sesión es del caller y sigue abierta
+  ├─ coherencia: pisos ≤ los de la mazmorra, jefe requiere pisos completos
+  ├─ tiempo: ni instantáneo ni fuera de la ventana de la sesión
+  └─ award_dungeon_run()  ← una transacción
+       consume sesión · registra run · suma EXP/oro/esencia
+       promueve de rango · avanza el acto si era mazmorra de historia
+```
+
+La energía se cobra **al entrar**, no al salir. Si se cobrara al final, un
+cliente modificado jugaría gratis; si no se cobrara nada al entrar, el jugador
+podría gastar un minuto y comerse un rechazo por falta de energía.
 
 ## RPCs disponibles para el cliente
 
 | RPC | Qué hace |
 |---|---|
-| `bootstrap_player(display_name)` | Crea perfil + slots de tabla en el primer login |
-| `purchase_upgrade(slot)` | Sube un slot un nivel cobrando Núcleos |
-| `claim_wreck(wreck_id)` | Recupera el naufragio de otro jugador |
+| `bootstrap_hunter(name, class)` | Crea el cazador y le da su poder tier 1 |
+| `current_energy(hunter_id)` | Energía vigente |
+| `evolve_power(power_id)` | Evoluciona un poder: prerequisito + desafío + esencia + oro |
+| `spend_gems(sink_id)` | Recarga de energía, revivir, skin o battle pass |
+| `create_clan(name, tag, desc)` | |
+| `join_clan(clan_id)` | Valida cupo de 50, rango mínimo y que esté abierto |
+| `leave_clan()` | El líder debe transferir antes de irse |
+| `set_clan_role(hunter_id, role)` | Solo el líder |
+| `set_clan_defender(hunter_id)` | Líder y capitanes |
 
-`credit_run(run_id)` existe pero está revocada para `authenticated` — solo
-`service_role`.
+Solo `service_role`: `spend_energy`, `refund_energy`, `award_dungeon_run`,
+`expire_dungeon_sessions`.
 
-## Edge Functions
+## Sin pay2win, a nivel schema
 
-```bash
-make fn-serve                    # local, con hot reload, leyendo ../.env
-make fn-deploy                   # todas
-make fn-deploy NAME=submit-run   # una sola
+El PDF §8 se compromete a que comprar no dé ventaja de poder. Eso está
+codificado como constraint:
+
+```sql
+constraint gem_sinks_no_power check (
+  is_cosmetic or id in ('energy_refill', 'revive')
+)
 ```
 
-Contrato completo de request/response: [../Docs/API/](../Docs/API/).
+Agregar un sink que dé stats o daño falla al insertarlo. No depende de que
+alguien se acuerde de la regla.
 
-## Migrations
+## Estado real
 
-```bash
-make db-diff NAME=add_contracts   # genera migration desde cambios locales
-make db-push                      # aplica al proyecto remoto
-```
+**Nada de esto se ejecutó todavía.** No hay Docker ni Supabase CLI en la
+máquina donde se escribió, así que el SQL no pasó por un parser y las Edge
+Functions no pasaron por `deno check`. El primer `make db-reset` es la prueba.
 
-Reglas:
+## Pendientes
 
-- Una migration aplicada en remoto **no se edita**. Se agrega otra.
-- Toda tabla nueva se crea con `enable row level security` en la **misma**
-  migration. Sin excepciones.
-- Nombres en `snake_case`, tablas en plural.
-
-## Cosas a resolver
-
-- [ ] Rate limiting en `submit-run` (hoy solo valida física y capacidad)
-- [ ] Firma HMAC del payload de run además de la validación heurística
-- [ ] Job semanal que cierre las cuotas (`quotas.settled`)
-- [ ] Retención: purgar `runs` de más de 90 días que no sean récords
+- [ ] Aplicar las migrations y arreglar lo que falle
+- [ ] Scheduler de Clan Wars cada 3 días (pg_cron o Edge Function)
+- [ ] `expire_dungeon_sessions()` programado
+- [ ] Integración con MercadoPago Paraguay: Edge Functions `create-payment` y
+      `payment-webhook`, productos en PYG
+- [ ] Cadenas de poderes de Phantom Guard, Abyss Mage y Beast Hunter
+- [ ] Rate limiting en `enter-dungeon`
+- [ ] Leaderboards (por rango, por clan)
+- [ ] Retención de `dungeon_runs` viejas
