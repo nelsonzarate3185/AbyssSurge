@@ -13,8 +13,8 @@ economía de gemas.
 
 > **El cliente no acredita nada.**
 
-El cliente Unity lee lo suyo, ejecuta nueve RPCs acotadas y llama dos Edge
-Functions. Todo lo que suma EXP, oro, esencia, gemas o rango pasa por
+El cliente Unity lee lo suyo, ejecuta nueve RPCs acotadas y llama tres Edge
+Functions (la cuarta, `payment-webhook`, la llama MercadoPago). Todo lo que suma EXP, oro, esencia, gemas o rango pasa por
 `service_role` después de validar.
 
 Tres capas de defensa, en este orden:
