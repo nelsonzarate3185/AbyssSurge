@@ -75,3 +75,8 @@ desktop.ini
 # ─── Claude Code (config local de máquina) ──────────────────
 .claude/settings.local.json
 .claude/settings.json
+
+# ─── Design canvas ──────────────────────────────────────────
+# El .html sembrado son ~2.5 MB que se regeneran desde los .dc.html
+# y canvas.json en cada re-seed. Las fuentes sí se versionan.
+Design/*.html
