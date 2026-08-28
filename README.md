@@ -11,14 +11,13 @@ en Supabase y pagos por MercadoPago Paraguay. Android + iOS.
 > [STORY.md](STORY.md) y [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md) están
 > reescritos desde ese PDF y son válidos.
 >
-> El backend de [Supabase/](Supabase/) y el contrato de
-> [Docs/API/](Docs/API/) están reescritos sobre la premisa correcta:
-> cazadores, mazmorras, clanes, rangos y gemas. **Todavía sin ejecutar** —
-> ver "Estado real" en [Supabase/README.md](Supabase/README.md).
+> Los documentos de diseño, el backend de [Supabase/](Supabase/) y el contrato
+> de [Docs/API/](Docs/API/) están alineados con el PDF. El backend **todavía no
+> se ejecutó** — ver "Estado real" en [Supabase/README.md](Supabase/README.md).
 >
-> **Siguen desactualizados:** [GAME_MECHANICS.md](GAME_MECHANICS.md) (tiene un
-> índice de los sistemas reales arriba, pero el cuerpo describe otro juego),
-> los scripts de [Unity/](Unity/) y [Docs/Architecture/](Docs/Architecture/).
+> **Sigue desactualizado:** el cliente [Unity/](Unity/) —sus scripts son los del
+> scaffold inicial, que describía otro juego— y
+> [Docs/Architecture/](Docs/Architecture/).
 
 ## Estructura del workspace
 
@@ -26,12 +25,12 @@ en Supabase y pagos por MercadoPago Paraguay. Android + iOS.
 |---|---|
 | [Docs/Abyss_Surge_Trama_y_Personajes.pdf](Docs/Abyss_Surge_Trama_y_Personajes.pdf) | **Fuente de verdad** del diseño |
 | [STORY.md](STORY.md) | Trama, mundo de Aetheron, 6 actos ✅ |
-| [GAME_MECHANICS.md](GAME_MECHANICS.md) | Índice de sistemas reales + borrador descartado ⚠️ |
+| [GAME_MECHANICS.md](GAME_MECHANICS.md) | Combate, mazmorras, energía, rangos, clanes, economía ✅ |
 | [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md) | 4 clases jugables, 4 NPCs, rangos, poderes ✅ |
 | [SETUP_CLAUDE_CODE.md](SETUP_CLAUDE_CODE.md) | Cómo trabajar en este repo con Claude Code |
 | [Unity/](Unity/) | Cliente móvil — scripts, escenas, recursos ⚠️ |
 | [Supabase/](Supabase/) | Schema SQL, Edge Functions, seeds ✅ |
-| [Docs/](Docs/) | Documentación técnica (API, arquitectura) |
+| [Docs/](Docs/) | API ✅ · arquitectura ⚠️ |
 | [Design/](Design/) | Especificaciones y assets visuales |
 
 ## Arranque rápido

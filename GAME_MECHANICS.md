@@ -1,182 +1,386 @@
-# AbyssSurge — Sistemas de juego
+# Abyss Surge — Sistemas de juego
 
-> ## ⚠️ ESTE DOCUMENTO DESCRIBE OTRO JUEGO
+> **Fuente:** [Docs/Abyss_Surge_Trama_y_Personajes.pdf](Docs/Abyss_Surge_Trama_y_Personajes.pdf)
+> (Nelson Zarate, 27/08/2026).
 >
-> Todo lo que sigue es un borrador especulativo escrito **antes** de que
-> apareciera [Docs/Abyss_Surge_Trama_y_Personajes.pdf](Docs/Abyss_Surge_Trama_y_Personajes.pdf),
-> y describe un roguelite de descenso vertical que **no es Abyss Surge**.
+> Tres marcas a lo largo del documento:
+> **[PDF]** viene textual del documento fuente · **[TUNE]** es un número
+> provisorio que hay que balancear · **[propuesta]** llena un hueco que el PDF
+> dejaba abierto.
 >
-> El juego real es un **RPG estratégico mobile** (Clash of Clans + Solo Leveling):
-> combate isométrico de 30–60 s, mazmorras de 3 pisos + jefe, rangos E→SSS,
-> clanes de hasta 50 miembros con Clan Wars, energía y gemas.
-> Ver [STORY.md](STORY.md) y [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md), que ya
-> están reescritos desde el PDF.
->
-> **No implementes nada de este archivo.** Queda solo para no perder el trabajo
-> hasta que se reescriba. Lo mismo aplica al schema de
-> [Supabase/migrations/](Supabase/migrations/), a los scripts de
-> [Unity/Assets/Scripts/](Unity/Assets/Scripts/) y a [Docs/](Docs/): están
-> construidos sobre esta premisa equivocada.
+> Cuando este documento y [Supabase/migrations/](Supabase/migrations/) se
+> contradigan, **manda el schema**. Cada sección apunta a la tabla que la
+> implementa.
+
+## Loop principal
+
+```
+  BASE (Ciudadela)              MAZMORRA                    BASE
+       │                            │                         │
+       ├─ elegís mazmorra ──────────┤                         │
+       │  y dificultad              │                         │
+       │                     3 pisos + 1 jefe                 │
+       │                     combates de 30–60 s              │
+       │                            │                         │
+       │                            ├─ EXP · oro · esencia ───┤
+       │                            │                         │
+       │◀── evolucionás poderes ────┴── subís de rango ────────┤
+       │    con esencia + oro                                  │
+       │                                                       │
+       └─ Clan Wars cada 3 días ◀──────────────────────────────┘
+```
+
+Cada entrada cuesta **10 de energía [PDF]**, y la energía se regenera con el
+tiempo. Eso es lo que define el ritmo del juego: sesiones cortas, varias por
+día, con un techo natural.
 
 ---
 
-## Sistemas del juego real (del PDF)
+## 1 · Combate **[PDF]**
 
-| Sistema | Resumen |
+| | |
 |---|---|
-| **Combate** | Isométrico, 30–60 s. Los enemigos avanzan; seleccionás poder; esquivás tocando el lado opuesto. Ganás esencia |
-| **Loadout** | 4 poderes activos + 2 pasivos (magia, defensa, summons, control) |
-| **Mazmorras** | 3 pisos + 1 jefe. Tipos: Historia, Grind, Despertar, Clan. Dificultades: Normal / Hard / Imposible. Costo: 10 energía |
-| **Rangos** | E → D → C → B → A → S → SS → SSS. Suben stats, desbloquean mazmorras, cambian el aura |
-| **Poderes** | Evolucionan (no suben de nivel). Requieren desafíos especiales + esencia + oro |
-| **Clanes** | Máx. 50 miembros. Roles: Líder, Capitanes, Oficiales. Ciudadela con defensor. Clan Wars cada 3 días |
-| **Monedas** | Oro y esencia (juego) · Gemas (premium) |
-| **Monetización** | Gemas: 100G=$0.99 / 500G=$4.99 / 1200G=$9.99. Usos: 10G refill energía, 50G revivir, 500G skins, 1000G Battle Pass mensual |
-| **Filosofía** | **Sin pay2win.** Cosmético puro; un F2P puede ganarle a un premium |
-| **Pagos** | MercadoPago Paraguay |
+| **Perspectiva** | Isométrica (estilo Clash of Clans) |
+| **Duración** | 30–60 segundos por combate |
+| **Loadout** | 4 poderes activos + 2 pasivos |
+| **Categorías** | Magia, defensa, summons, control |
 
-Esto es un índice, no una especificación. Falta desarrollarlo: curvas de EXP por
-rango, regeneración de energía, fórmulas de daño, matchmaking de Clan Wars,
-economía de esencia/oro.
+**Mecánica:** los enemigos avanzan. Seleccionás un poder. Esquivás tocando el
+lado opuesto. Ganás esencia.
+
+Un solo dedo, sin joystick virtual. La decisión por segundo es *qué poder* y
+*hacia qué lado*, no dónde pararte.
+
+### Stats en combate
+
+Los cuatro stats de [`class_archetypes`](Supabase/migrations/007_reference_data.sql),
+escalados por el multiplicador del rango:
+
+| Stat | Qué hace |
+|---|---|
+| **HP** | Cuánto aguanta antes de caer |
+| **ATK** | Daño base, multiplicado por el `damage_multiplier` del poder |
+| **DEF** | Reducción del daño recibido |
+| **VEL** | Frecuencia con la que puede actuar y ventana de esquiva |
+
+> Las fórmulas concretas de daño y de ventana de esquiva **no están definidas**.
+> Es lo primero que hace falta prototipar: sin eso, los stats son decorativos.
+
+**Revivir** cuesta 50 gemas y no deja efecto persistente — lo consume la run en
+curso. Ver §8.
 
 ---
 
-## Borrador descartado (roguelite de descenso)
+## 2 · Clases
 
-## Género y loop
+Cuatro arquetipos. Se elige uno al despertar en el Acto I y **no se puede
+cambiar**. Detalle completo en [CHARACTER_DESIGN.md](CHARACTER_DESIGN.md).
 
-**Roguelite de descenso vertical, sesiones cortas, control táctil de un dedo.**
+| Clase | HP | ATK | DEF | VEL | Fortaleza | Debilidad |
+|---|---:|---:|---:|---:|---|---|
+| **Dark Slayer** | 100 | 12 | 4 | 9 | Daño extremo, velocidad rápida | Muy frágil |
+| **Phantom Guard** | 140 | 8 | 8 | 5 | Durabilidad extrema | Daño lento |
+| **Abyss Mage** | 90 | 9 | 5 | 10 | AoE devastador, maná ilimitado | Muy frágil |
+| **Beast Hunter** | 110 | 11 | 6 | 8 | Equilibrado, escalable, versátil | Sin pico **[propuesta]** |
 
-```
-BASE (Ancla)  ──▶  DESCENSO (run)  ──▶  EXTRACCIÓN  ──▶  ASCENSO  ──▶  BASE
-     ▲                                                        │
-     └────────────────── meta-progresión ─────────────────────┘
-```
+Stats **[PDF]**. La debilidad del Beast Hunter es propuesta: el PDF listaba
+«versátil» como debilidad, se confirmó que es fortaleza, y la clase quedaba sin
+costo. «Sin pico» significa que **no saltea encuentros: los juega todos**.
 
-Duración objetivo de una run: **3–6 minutos**. Es un juego móvil: tiene que
-sobrevivir a que te interrumpan.
+Schema: `class_archetypes`, vista `hunter_stats`.
 
-## 1. Descenso (core loop)
+---
 
-El Surfista cae. La gravedad es constante; el jugador controla **inclinación**
-y **frenado**.
+## 3 · Poderes **[PDF]**
 
-| Input | Acción |
+Los poderes **no suben de nivel: evolucionan**. Cada evolución es una entrada
+distinta del catálogo que apunta a la anterior.
+
+Cadena del Dark Slayer, textual del PDF:
+
+| Tier | Poder | Efecto |
+|---|---|---|
+| 1 | **Golpe Sombra** | 1.0× daño |
+| 2 | **Cortadura Abismo** | 1.8× + crítico |
+| 3 | **Tornada Oscura** | 2.5× en AoE |
+| 4 | **Invocación Espectros** | Summon |
+
+Evolucionar requiere **desafío especial + esencia + oro [PDF]**, más el rango
+mínimo del poder.
+
+**El poder anterior no se pierde.** Evolucionar *amplía* el loadout disponible
+en vez de reemplazarlo — así el jugador de tier 4 sigue pudiendo equipar el
+tier 1 si le conviene para un encuentro.
+
+> Las cadenas de **Phantom Guard**, **Abyss Mage** y **Beast Hunter** no están
+> diseñadas. Hoy tienen solo un tier 1 placeholder para que
+> `bootstrap_hunter()` funcione.
+
+Schema: `powers`, `hunter_powers`, `power_challenges`, RPC `evolve_power()`.
+
+---
+
+## 4 · Mazmorras **[PDF]**
+
+Estructura fija: **3 pisos + 1 jefe**. Costo: **10 de energía**.
+
+### Tipos
+
+| Tipo | Para qué |
 |---|---|
-| Arrastrar horizontal | Inclinar la tabla (deriva lateral) |
-| Mantener presionado | Frenar — consume Oxígeno más rápido |
-| Doble tap | *Surge Dash* — impulso vertical, consume 1 carga |
-| Soltar todo | Caída libre — máxima velocidad, mínimo control |
+| **Historia** | Una por acto. Completarla cierra el acto y avanza la narrativa |
+| **Grind** | EXP, oro y esencia. Repetible |
+| **Despertar** | Los desafíos especiales que habilitan evoluciones de poder |
+| **Clan** | Requiere pertenecer a un clan. Alimenta las Clan Wars |
 
-**Tensión de diseño:** bajar rápido da más profundidad (más recompensa) pero
-menos tiempo de reacción. Bajar lento es seguro pero el Oxígeno no alcanza.
+### Dificultades
 
-## 2. Recursos de run
+| Dificultad | Enemigos | Recompensa | Rango mínimo |
+|---|---:|---:|---|
+| **Normal** | ×1.00 | ×1.00 | E |
+| **Hard** | ×1.60 | ×1.80 | C **[TUNE]** |
+| **Imposible** | ×2.75 | ×3.50 | A **[TUNE]** |
 
-| Recurso | Rol | Se agota por |
+Los multiplicadores son `[TUNE]`: el PDF nombra las tres dificultades pero no
+las cuantifica.
+
+Schema: `dungeons`, `difficulty_modifiers`, `dungeon_sessions`, `dungeon_runs`.
+
+---
+
+## 5 · Energía **[propuesta]**
+
+El PDF fija el costo (10 por mazmorra) pero no el techo ni la regeneración.
+
+| Constante | Valor | Dónde se tunea |
+|---|---:|---|
+| Energía máxima | 50 **[TUNE]** | `game_settings.energy_max` |
+| Regeneración | 1 punto / 6 min **[TUNE]** | `game_settings.energy_regen_minutes` |
+| Lleno desde cero | 5 h | — |
+| Mazmorras con el tanque lleno | 5 | — |
+
+**No hay job de regeneración.** `hunters.energy` guarda el último valor
+materializado y `energy_updated_at` cuándo se materializó; la energía vigente
+se calcula al leer:
+
+```
+vigente = min(máximo, energy + minutos_transcurridos / 6)
+```
+
+Al gastar se **preserva el avance parcial** hacia el próximo punto. Sin eso,
+gastar energía reiniciaría el timer y el jugador perdería progreso invisible
+cada vez que entra a una mazmorra.
+
+Schema: `current_energy()`, `spend_energy()`, `refund_energy()`.
+
+---
+
+## 6 · Rangos y progresión **[PDF]** + **[propuesta]**
+
+Ocho rangos: **E → D → C → B → A → S → SS → SSS**
+
+Al subir: suben las stats base, se desbloquean mazmorras nuevas, y **el aura
+crece y se vuelve más oscura [PDF]**.
+
+| Rango | EXP acumulada | Stats | Aura (escala / oscuridad) |
+|---|---:|---:|---|
+| E | 0 | ×1.00 | 1.00 / 0.00 |
+| D | 1 000 | ×1.25 | 1.15 / 0.10 |
+| C | 3 500 | ×1.55 | 1.30 / 0.22 |
+| B | 9 000 | ×1.90 | 1.50 / 0.36 |
+| A | 20 000 | ×2.35 | 1.75 / 0.52 |
+| S | 45 000 | ×2.90 | 2.00 / 0.68 |
+| SS | 100 000 | ×3.60 | 2.35 / 0.85 |
+| SSS | 250 000 | ×4.50 | 2.80 / 1.00 |
+
+Toda la tabla es **[TUNE]**: el PDF dice que las stats suben, no cuánto.
+
+**El aura es dato, no lógica.** Unity lee `aura_scale` y `aura_darkness` y los
+aplica; no calcula nada. Objetivo de legibilidad: **leer el rango de otro
+jugador de un vistazo, sin UI**.
+
+### Dónde cae cada rango en la campaña **[propuesta]**
+
+- **E → S** es la campaña (Actos I–VI)
+- **C** es el rango de Lyra, y el único con un beat propio: su Prueba de Ascenso
+- **SS** es post-campaña: abre *La Cicatriz*, mazmorras que dependen del final
+  que elegiste
+- **SSS** requiere SS + los cuatro arcos de personaje cerrados, y desbloquea el
+  quinto final
+
+Ver [STORY.md](STORY.md).
+
+Schema: `rank_tiers`, promoción automática dentro de `award_dungeon_run()`.
+
+---
+
+## 7 · Economía
+
+| Moneda | De dónde sale | En qué se gasta |
 |---|---|---|
-| **Oxígeno** | Timer de la run | Tiempo + frenado + daño |
-| **Integridad** | HP de la tabla | Colisiones, Despiertos |
-| **Cargas de Surge** | Recurso de habilidad | Dash, escudo, pulso |
-| **Núcleos** | Botín — moneda de la run | *(se pierden si no ascendés)* |
+| **Oro** | Mazmorras | Evolución de poderes |
+| **Esencia** | Combate y mazmorras | Evolución de poderes |
+| **Gemas** | Compra con dinero real | Conveniencia y cosmética — §8 |
 
-**Regla clave:** los Núcleos solo se acreditan al **completar el ascenso**.
-Morir a 900 m con la bolsa llena no te da nada. Eso es el juego.
+Costo de evolución: `desafío + esencia + oro`, definido por poder en el catálogo.
 
-## 3. Profundidad y zonas
+**Nada se acredita en el cliente.** Toda suma de EXP, oro, esencia o rango pasa
+por `award_dungeon_run()` con `service_role`, en una sola transacción. Ver §11.
 
-La profundidad es la métrica de progreso dentro de la run.
+Schema: `hunters.gold / essence / gems`, `gem_ledger`.
 
-| Tramo | Profundidad | Presión | Multiplicador de botín |
-|---|---|---|---|
-| Plataforma | 0–200 m | 1.0× | 1.0× |
-| Termoclina | 200–600 m | 1.4× | 1.8× `[TUNE]` |
-| Zona muerta | 600–1200 m | 2.1× | 3.2× `[TUNE]` |
-| La Grieta | 1200 m+ | 3.0× | 5.0× `[TUNE]` |
+---
 
-La **Presión** multiplica el consumo de Oxígeno y el daño recibido.
+## 8 · Monetización **[PDF]**
 
-## 4. Ascenso
+### Paquetes de gemas
 
-Cuando el jugador decide subir (o se queda sin profundidad disponible), la run
-se invierte: la cámara sube, los patrones de enemigo cambian, **no se puede
-frenar**. El ascenso es un minijuego de esquivar puro.
+| Paquete | Precio USD | Precio PYG |
+|---|---:|---:|
+| 100 gemas | $0.99 | ₲7.000 **[TUNE]** |
+| 500 gemas | $4.99 | ₲35.000 **[TUNE]** |
+| 1200 gemas | $9.99 | ₲70.000 **[TUNE]** |
 
-Costo de ascenso: `oxígeno_requerido = profundidad_actual × 0.4` `[TUNE]`
+Los precios en USD son **[PDF]** y sirven para App Store / Google Play. Los de
+PYG son **placeholder**: MercadoPago Paraguay cobra en guaraníes y todavía no
+hay una decisión comercial sobre esos montos.
 
-Esto obliga a la decisión central: *un tramo más* vs. *volver con lo que tengo*.
+### En qué se gastan
 
-## 5. Meta-progresión (entre runs)
+| Uso | Gemas | Tipo |
+|---|---:|---|
+| Recarga de energía | 10 | Conveniencia |
+| Revivir en batalla | 50 | Conveniencia |
+| Skin cosmética | 500 | Cosmética |
+| Battle Pass mensual | 1000 | Cosmética |
 
-### Tabla (Board)
-Se mejora con **Chatarra** (drop común). Ramas:
-- **Casco** — Integridad máxima
-- **Regulador** — Oxígeno máximo y eficiencia bajo presión
-- **Quilla** — control lateral y velocidad de deriva
-- **Colector** — capacidad de Núcleos y radio de recolección
+### Sin pay2win, como constraint
 
-### Corrupción (Corruption)
-Contador **permanente** que sube al usar Surge y al descender bajo 600 m.
+> «Cosmética pura. Jugadores F2P pueden ganar vs premium. No hay ventaja de
+> poder comprando.» **[PDF §8]**
 
-| Nivel | Efecto positivo | Efecto negativo |
+Ese compromiso está codificado en el schema, no en una convención:
+
+```sql
+constraint gem_sinks_no_power check (
+  is_cosmetic or id in ('energy_refill', 'revive')
+)
+```
+
+Agregar un sink que dé stats o daño **falla al insertarlo**. No depende de que
+alguien se acuerde de la regla en dos años.
+
+Schema: `gem_products`, `gem_sinks`, `purchases`, `gem_ledger`, `entitlements`.
+Integración: [Docs/API/](Docs/API/README.md).
+
+---
+
+## 9 · Clanes y Clan Wars **[PDF]**
+
+| | |
+|---|---|
+| **Miembros** | Máximo 50 |
+| **Roles** | Líder · Capitanes · Oficiales · Miembros |
+| **Ciudadela** | Con un defensor designado |
+| **Clan Wars** | Cada 3 días |
+
+Reglas de gobierno implementadas:
+
+- Un cazador pertenece **a un solo clan** (es la PK de `clan_members`)
+- El líder **no puede irse sin transferir** el liderazgo
+- Solo el líder asigna roles; líder y capitanes designan al defensor
+- Un clan no puede estar en dos guerras activas a la vez
+
+> **Falta el scheduler.** Las tablas de `clan_wars` existen pero nada arma las
+> guerras cada 3 días. Hace falta un job (pg_cron o Edge Function) con criterio
+> de emparejamiento.
+
+Schema: `clans`, `clan_members`, `clan_wars`, `clan_war_battles`.
+
+---
+
+## 10 · La narrativa como sistema
+
+Los seis actos no son cinemáticas sueltas: cada uno tiene **una mazmorra de
+historia** con su rango mínimo. Completarla cierra el acto.
+
+| Acto | Mazmorra | Rango |
 |---|---|---|
-| 0–25 | — | — |
-| 26–50 | +10% velocidad de descenso | Visión periférica reducida |
-| 51–75 | Ver Núcleos a través del terreno | Oxígeno máximo −15% |
-| 76–99 | Dash gratis cada 30 s | Enemigos ambientales te ignoran… y los Despiertos te siguen |
-| 100 | **Punto de no retorno narrativo** | Se bloquea el final 1 |
+| I · El Llamado del Abismo | `story_01_llamado` | E |
+| II · Clanes y Competencia | `story_02_clanes` | D |
+| *Interludio · La Prueba de Lyra* **[propuesta]** | *(pendiente)* | C |
+| III · Misterios en Profundidades | `story_03_misterios` | B |
+| IV · El Ritual Oscuro | `story_04_ritual` | A |
+| V · Verdad Abismal | `story_05_verdad` | S |
+| VI · Nuevo Orden | `story_06_nuevo_orden` | S |
 
-La Corrupción **no se puede bajar con recursos**, solo con decisiones narrativas
-concretas. Es el reloj largo del juego.
+El rango mínimo es el gate: no se avanza la historia sin haber jugado. Eso
+liga la narrativa al grind sin que haga falta un sistema aparte.
 
-## 6. Economía
+Schema: `dungeons.story_act`, `story_progress`, `hunters.story_act`.
 
-| Moneda | Fuente | Gasto |
-|---|---|---|
-| **Núcleos** | Extracción en run | Upgrades de tabla, desbloqueos de zona |
-| **Chatarra** | Drop común, desguace | Reparaciones, consumibles |
-| **Crédito de Ancla** | Cuotas del Consorcio | Progresión narrativa, acceso a facciones |
+---
 
-**Sin moneda premium en el diseño base.** Si más adelante se monetiza, que sea
-cosmético sobre la tabla — nunca sobre Oxígeno, Integridad ni Corrupción.
+## 11 · Autoridad del servidor
 
-## 7. Cuotas (presión narrativa como sistema)
+El juego es single-player en ejecución pero comparte clanes, guerras y
+leaderboards. Un cliente móvil es trivialmente modificable, así que:
 
-El Consorcio asigna una cuota semanal de Núcleos.
+> **El cliente no acredita nada.**
 
-- Cumplirla → Crédito de Ancla, acceso a mejor equipo
-- Fallarla → pérdida de acceso a zonas, avanza el arco de los Sin Lastre
+Tres capas, en orden:
 
-La cuota **escala más rápido que la capacidad del jugador**. Es intencional:
-el sistema está diseñado para volverse imposible. Ese es el Acto II.
+1. **RLS** decide qué filas ve cada jugador
+2. **Grants por columna** deciden qué columnas puede escribir — RLS no filtra
+   columnas, y sin el grant la policy de `update` sobre `hunters` dejaría al
+   jugador editarse el oro
+3. **Edge Functions** validan la lógica de juego antes de acreditar
 
-## 8. Multijugador asíncrono (Supabase)
+En todo el schema el cliente puede escribir **exactamente dos columnas**:
+`hunters.display_name` y `hunter_powers.loadout_slot`.
 
-No hay PvP en tiempo real. Sí hay:
+### Flujo de una mazmorra
 
-- **Fantasmas** — el trazo de descenso de otro jugador en la misma seed
-- **Leaderboard** por profundidad y por Núcleos extraídos, semanal
-- **Naufragios** — donde otro jugador murió aparece su tabla; recuperarla te da
-  parte de su botín y le envía a él una notificación (y una fracción de recompensa)
-- **Seed diaria** — misma run para todos, un intento
+```
+enter-dungeon              ← cobra la energía ACÁ
+  ├─ valida rango vs. mazmorra y dificultad
+  ├─ si es mazmorra de clan, valida membresía
+  └─ abre dungeon_sessions (vence en 30 min)
 
-Todo esto es escritura/lectura de tablas + Edge Functions. Ver
-[Supabase/README.md](Supabase/README.md) y [Docs/Architecture/](Docs/Architecture/).
+  ═══ combate offline ═══
 
-## 9. Anti-cheat (mínimo viable)
+complete-dungeon-run
+  ├─ la sesión es del caller y sigue abierta
+  ├─ coherencia: pisos ≤ los de la mazmorra, jefe requiere pisos completos
+  ├─ tiempo: ni instantáneo ni fuera de la ventana
+  └─ award_dungeon_run() ← una transacción
+```
 
-El cliente **no** decide recompensas. El cliente envía un resumen de run firmado;
-la Edge Function `submit-run` valida:
+La energía se cobra **al entrar**. Si se cobrara al salir, un cliente
+modificado jugaría gratis; si no se cobrara nada al entrar, el jugador podría
+gastar un minuto y comerse un rechazo por falta de energía.
 
-- Profundidad alcanzable dado el tiempo transcurrido (`v_max` por tramo)
-- Núcleos ≤ capacidad del colector equipado
-- Timestamps monotónicos y coherentes con la seed del día
+Contrato completo: [Docs/API/](Docs/API/README.md).
 
-Rechazo → la run no se acredita. Ver [Docs/API/](Docs/API/).
+---
 
-## Pendientes
+## Pendientes, por prioridad
 
-- [ ] Curva de Oxígeno vs. profundidad — hace falta prototipo jugable
-- [ ] Cuántos enemigos distintos por tramo (target: 3 por tramo)
-- [ ] ¿La Corrupción persiste en NG+?
-- [ ] Definir seed determinista compartida cliente/servidor
+**Bloqueante para prototipar**
+- [ ] Fórmula de daño y ventana de esquiva — sin eso los stats no significan nada
+- [ ] Cliente Unity: sigue siendo el del scaffold equivocado
+
+**Diseño sin resolver**
+- [ ] Cadenas de poderes de Phantom Guard, Abyss Mage y Beast Hunter
+- [ ] Enemigos: el PDF no menciona ninguno
+- [ ] Curvas de EXP y multiplicadores de dificultad (hoy todo `[TUNE]`)
+- [ ] Mazmorra del Interludio de Lyra
+
+**Backend**
+- [ ] Aplicar las migrations y arreglar lo que falle
+- [ ] Scheduler de Clan Wars + criterio de emparejamiento
+- [ ] Job que cierre compras `pending` viejas y sesiones vencidas
+
+**Negocio**
+- [ ] Precios reales en PYG
+- [ ] Contenido del Battle Pass y catálogo de skins
